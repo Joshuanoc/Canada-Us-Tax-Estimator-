@@ -1,0 +1,808 @@
+<!doctype doctype>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Tax Estimator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .input-group {
+      margin-bottom: 1rem;
+    }
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: help;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 280px;
+      background-color: #1e293b;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px 12px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 13px;
+      line-height: 1.4;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .tooltip .tooltiptext::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1e293b transparent transparent transparent;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .section-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    }
+    
+    .tab-button {
+      transition: all 0.2s;
+    }
+    
+    .tab-button.active {
+      border-bottom: 3px solid;
+    }
+    
+    input[type="number"], input[type="text"], select {
+      transition: all 0.2s;
+    }
+    
+    input[type="number"]:focus, input[type="text"]:focus, select:focus {
+      outline: none;
+      border-width: 2px;
+    }
+    
+    .summary-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 16px;
+      padding: 32px;
+      color: white;
+      box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+    }
+    
+    .calculation-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .calculation-row:last-child {
+      border-bottom: none;
+    }
+    
+    .loader {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-left: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+ </head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full" style="background: linear-gradient(to bottom right, #f8fafc, #e2e8f0); overflow-auto;">
+   <div style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;"><!-- Header -->
+    <div style="text-align: center; margin-bottom: 40px;">
+     <h1 id="mainTitle" style="font-size: 48px; font-weight: 700; margin-bottom: 8px; color: #0f172a;">Professional Tax Estimator</h1>
+     <p id="tagline" style="font-size: 20px; color: #64748b;">US &amp; Canada Tax Calculator</p>
+    </div><!-- Country Selection -->
+    <div class="section-card"><label for="country" style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155;">Select Country</label> <select id="country" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;"> <option value="us">🇺🇸 United States</option> <option value="canada">🇨🇦 Canada</option> </select>
+    </div><!-- Tax Type Selection -->
+    <div class="section-card"><label style="display: block; font-weight: 600; margin-bottom: 12px; color: #334155;">Tax Type</label>
+     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"><button id="personalBtn" class="tab-button active" style="padding: 16px; border: 2px solid #667eea; border-radius: 8px; font-weight: 600; background: #667eea; color: white;"> Personal Tax </button> <button id="businessBtn" class="tab-button" style="padding: 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: 600; background: white; color: #64748b;"> Business Tax </button>
+     </div>
+    </div><!-- Personal Tax Form -->
+    <div id="personalForm" style="display: block;"><!-- Filing Status -->
+     <div class="section-card">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Filing Status</h3><label for="filingStatus" style="display: block; font-weight: 500; margin-bottom: 8px; color: #334155;">Status</label> <select id="filingStatus" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;"> <option value="single">Single</option> <option value="married_joint">Married Filing Jointly</option> <option value="married_separate">Married Filing Separately</option> <option value="head">Head of Household</option> </select>
+     </div><!-- Income Section -->
+     <div class="section-card">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Income Sources</h3>
+      <div class="input-group"><label for="wages" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Wages, Salaries, Tips (W-2/T4) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Include all employment income from W-2 (US) or T4 (Canada) forms. This is your primary employment income before taxes.</span> </span> </label> <input type="number" id="wages" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="interest" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Interest Income <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Interest from savings accounts, CDs, bonds. Report all taxable interest income from financial institutions.</span> </span> </label> <input type="number" id="interest" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="dividends" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Dividend Income <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Dividends from stocks and mutual funds. Qualified dividends may receive preferential tax rates.</span> </span> </label> <input type="number" id="dividends" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="capitalGains" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Capital Gains/Losses <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Profit or loss from sale of stocks, real estate, or other investments. Enter negative number for losses (can offset up to $3,000 of other income in US).</span> </span> </label> <input type="number" id="capitalGains" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="selfEmployment" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Self-Employment Income <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Income from freelancing, contracting, or running a sole proprietorship. You'll owe both income tax and self-employment tax (15.3% in US).</span> </span> </label> <input type="number" id="selfEmployment" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="rentalIncome" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Rental Income (Net) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Net rental income after expenses (mortgage interest, property tax, repairs, depreciation). Enter the net amount.</span> </span> </label> <input type="number" id="rentalIncome" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="retirement" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Retirement Distributions (IRA/401k/RRSP) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Taxable distributions from retirement accounts. Traditional IRA/401k/RRSP withdrawals are fully taxable. Roth distributions are tax-free.</span> </span> </label> <input type="number" id="retirement" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="socialSecurity" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Social Security/CPP Benefits <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Social Security (US) or Canada Pension Plan benefits. Up to 85% may be taxable depending on your total income.</span> </span> </label> <input type="number" id="socialSecurity" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="otherIncome" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Other Income <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Alimony received, unemployment, gambling winnings, prizes, awards, jury duty pay, or any other taxable income.</span> </span> </label> <input type="number" id="otherIncome" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+     </div><!-- Deductions Section -->
+     <div class="section-card">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Deductions &amp; Credits</h3>
+      <div class="input-group"><label style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> <input type="checkbox" id="standardDeduction" checked style="margin-right: 8px; width: 20px; height: 20px;"> Use Standard Deduction <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">2024 US: $14,600 (single), $29,200 (married). Canada: Basic personal amount ~$15,000. Most taxpayers benefit from standard deduction.</span> </span> </label>
+      </div>
+      <div id="itemizedSection" style="display: none;">
+       <div class="input-group"><label for="mortgageInterest" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Mortgage Interest <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Interest paid on mortgage for primary or secondary home. US: Limited to interest on $750,000 of debt. Keep Form 1098.</span> </span> </label> <input type="number" id="mortgageInterest" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+       </div>
+       <div class="input-group"><label for="propertyTax" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> State/Property Taxes (SALT) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">US: State income tax + property tax, capped at $10,000 total. Canada: Property taxes are not federally deductible but may reduce provincial tax.</span> </span> </label> <input type="number" id="propertyTax" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+       </div>
+       <div class="input-group"><label for="charitableDonations" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Charitable Donations <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Cash and non-cash donations to qualified charities. Keep receipts. US: Limited to 60% of AGI. Canada: Generous tax credits for donations.</span> </span> </label> <input type="number" id="charitableDonations" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+       </div>
+       <div class="input-group"><label for="medicalExpenses" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Medical Expenses <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">US: Only amount exceeding 7.5% of AGI is deductible. Canada: Amount exceeding 3% of income. Include insurance premiums, prescriptions, dental, vision.</span> </span> </label> <input type="number" id="medicalExpenses" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+       </div>
+      </div>
+      <div class="input-group"><label for="retirementContrib" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Retirement Contributions (IRA/RRSP) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Traditional IRA/RRSP contributions reduce taxable income. 2024 limits: US IRA $7,000 ($8,000 if 50+), Canada RRSP 18% of income up to ~$31,560.</span> </span> </label> <input type="number" id="retirementContrib" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="hsaContrib" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> HSA Contributions (US Only) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Health Savings Account contributions. 2024 limits: $4,150 (individual), $8,300 (family), +$1,000 if 55+. Triple tax advantage!</span> </span> </label> <input type="number" id="hsaContrib" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="studentLoanInterest" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Student Loan Interest <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Interest paid on qualified student loans. US: Up to $2,500 deductible, phases out at higher incomes. Canada: Federal and provincial credits available.</span> </span> </label> <input type="number" id="studentLoanInterest" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="childcareExpenses" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Childcare Expenses <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Daycare, babysitting, summer camps for children under 13. US: Up to $3,000 per child credit. Canada: Deductible up to $8,000 per child under 7.</span> </span> </label> <input type="number" id="childcareExpenses" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="educationExpenses" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Education Expenses <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Tuition and education-related expenses. US: American Opportunity Credit up to $2,500. Canada: Tuition tax credit for post-secondary education.</span> </span> </label> <input type="number" id="educationExpenses" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="dependents" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Number of Dependents <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Children and qualifying relatives. US: $2,000 per child credit. Canada: Canada Child Benefit (separate from tax return). Increases standard deduction.</span> </span> </label> <input type="number" id="dependents" placeholder="0" step="1" min="0" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+     </div>
+    </div><!-- Business Tax Form -->
+    <div id="businessForm" style="display: none;"><!-- Business Type -->
+     <div class="section-card">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Business Information</h3>
+      <div class="input-group"><label for="businessType" style="display: block; font-weight: 500; margin-bottom: 8px; color: #334155;">Business Entity Type</label> <select id="businessType" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;"> <option value="sole_proprietor">Sole Proprietorship</option> <option value="partnership">Partnership</option> <option value="llc">LLC (Pass-through)</option> <option value="s_corp">S Corporation</option> <option value="c_corp">C Corporation</option> </select>
+      </div>
+      <div class="input-group"><label for="businessIndustry" style="display: block; font-weight: 500; margin-bottom: 8px; color: #334155;">Industry</label> <select id="businessIndustry" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;"> <option value="retail">Retail Trade</option> <option value="professional">Professional Services</option> <option value="construction">Construction</option> <option value="manufacturing">Manufacturing</option> <option value="hospitality">Hospitality/Food Service</option> <option value="healthcare">Healthcare</option> <option value="technology">Technology</option> <option value="real_estate">Real Estate</option> <option value="other">Other</option> </select>
+      </div>
+     </div><!-- Business Revenue -->
+     <div class="section-card">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Revenue</h3>
+      <div class="input-group"><label for="grossReceipts" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Gross Receipts/Sales <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Total revenue from all business operations before any expenses. Include all cash and credit sales, services rendered, and other business income.</span> </span> </label> <input type="number" id="grossReceipts" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="returnsAllowances" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Returns &amp; Allowances <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Refunds, returns, and allowances given to customers. Reduces gross revenue to calculate net revenue.</span> </span> </label> <input type="number" id="returnsAllowances" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="otherBusinessIncome" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Other Business Income <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Interest on business accounts, scrap sales, rental income from business property, or any other business-related income.</span> </span> </label> <input type="number" id="otherBusinessIncome" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+     </div><!-- Cost of Goods Sold -->
+     <div class="section-card">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Cost of Goods Sold (COGS)</h3>
+      <div class="input-group"><label for="beginningInventory" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Beginning Inventory <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Value of inventory at the start of the tax year. Should match ending inventory from previous year.</span> </span> </label> <input type="number" id="beginningInventory" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="purchases" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Purchases <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Cost of inventory purchased during the year. For manufacturers, include raw materials. Don't include items for personal use.</span> </span> </label> <input type="number" id="purchases" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="laborCosts" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Direct Labor Costs <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Wages paid to employees directly involved in production. For manufacturers/contractors. Don't include salaries of administrative staff.</span> </span> </label> <input type="number" id="laborCosts" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="endingInventory" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Ending Inventory <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Value of unsold inventory at year end. Physical count required. Will be next year's beginning inventory.</span> </span> </label> <input type="number" id="endingInventory" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+     </div><!-- Business Expenses -->
+     <div class="section-card">
+      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Business Expenses</h3>
+      <div class="input-group"><label for="advertising" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Advertising &amp; Marketing <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Business cards, websites, online ads, social media marketing, print ads, promotional materials. Must be ordinary and necessary for business.</span> </span> </label> <input type="number" id="advertising" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="vehicleExpenses" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Vehicle Expenses <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Keep mileage log! US: $0.67/mile or actual expenses (gas, insurance, maintenance) × business use %. Canada: $0.68/km for first 5,000 km.</span> </span> </label> <input type="number" id="vehicleExpenses" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="officeExpenses" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Office Expenses &amp; Supplies <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Office supplies, postage, small equipment under $2,500. Items over this must be depreciated. Software subscriptions included.</span> </span> </label> <input type="number" id="officeExpenses" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="rentLease" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Rent/Lease Payments <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Business premises rent, equipment leases, vehicle leases. Must be for business use only. Home office has special rules.</span> </span> </label> <input type="number" id="rentLease" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="utilities" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Utilities <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Electricity, gas, water, internet, phone for business location. For home office, deduct business percentage only.</span> </span> </label> <input type="number" id="utilities" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="insurance" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Insurance (Business) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">General liability, professional liability, property insurance, workers comp. Self-employed health insurance deducted separately on personal return.</span> </span> </label> <input type="number" id="insurance" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="professionalFees" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Professional Fees <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Legal fees, accounting, bookkeeping, consulting. Tax preparation fees are deductible. Retain all invoices and statements.</span> </span> </label> <input type="number" id="professionalFees" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="wages" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Employee Wages &amp; Benefits <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Salaries, bonuses, health insurance, retirement contributions for employees. Exclude owner's draw. Include employer portion of payroll taxes.</span> </span> </label> <input type="number" id="wages" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="repairs" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Repairs &amp; Maintenance <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Repairs that maintain property in working condition. Improvements that extend life must be depreciated. Keep detailed records.</span> </span> </label> <input type="number" id="repairs" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="travel" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Travel &amp; Meals <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Business travel (airfare, hotels), business meals (50% deductible). Must be ordinary and necessary. Entertainment no longer deductible in US.</span> </span> </label> <input type="number" id="travel" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="depreciation" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Depreciation <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Computers, equipment, vehicles, buildings depreciate over time. Section 179 allows immediate expensing up to $1.22M (US). Consult tax professional for calculation.</span> </span> </label> <input type="number" id="depreciation" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="businessInterest" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Interest (Business Loans) <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Interest on business loans, credit cards used for business, equipment financing. Personal interest is not deductible. Keep statements.</span> </span> </label> <input type="number" id="businessInterest" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="otherExpenses" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Other Business Expenses <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Bank fees, licenses, permits, subscriptions, education/training related to business. Must be ordinary, necessary, and reasonable for your industry.</span> </span> </label> <input type="number" id="otherExpenses" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+      <div class="input-group"><label for="homeOffice" style="display: flex; align-items: center; font-weight: 500; margin-bottom: 8px; color: #334155;"> Home Office Deduction <span class="tooltip" style="margin-left: 8px; color: #667eea; font-size: 18px;">ℹ️ <span class="tooltiptext">Must be exclusive and regular use for business. US: Simplified $5/sq ft up to 300 sq ft, or actual method (% of home expenses). Canada: Employment use of home expenses.</span> </span> </label> <input type="number" id="homeOffice" placeholder="0.00" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; color: #1e293b;">
+      </div>
+     </div>
+    </div><!-- Calculate Button -->
+    <div style="text-align: center; margin: 32px 0;"><button id="calculateBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 48px; border-radius: 12px; font-size: 18px; font-weight: 700; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: transform 0.2s;"> Calculate Tax Estimate </button>
+    </div><!-- Results Section -->
+    <div id="results" style="display: none;">
+     <div class="summary-card">
+      <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px; text-align: center;">Tax Calculation Summary</h2>
+      <div class="calculation-row"><span style="font-size: 18px;">Total Income:</span> <span id="totalIncome" style="font-size: 18px; font-weight: 700;">$0.00</span>
+      </div>
+      <div class="calculation-row"><span style="font-size: 18px;">Total Deductions:</span> <span id="totalDeductions" style="font-size: 18px; font-weight: 700;">$0.00</span>
+      </div>
+      <div class="calculation-row"><span style="font-size: 18px;">Taxable Income:</span> <span id="taxableIncome" style="font-size: 18px; font-weight: 700;">$0.00</span>
+      </div>
+      <div class="calculation-row" style="border-top: 2px solid white; padding-top: 16px; margin-top: 16px;"><span style="font-size: 24px; font-weight: 700;">Estimated Tax:</span> <span id="estimatedTax" style="font-size: 24px; font-weight: 700;">$0.00</span>
+      </div>
+      <div class="calculation-row"><span style="font-size: 18px;">Effective Tax Rate:</span> <span id="effectiveRate" style="font-size: 18px; font-weight: 700;">0.0%</span>
+      </div>
+      <div id="businessSummary" style="display: none; margin-top: 24px; padding-top: 24px; border-top: 2px solid rgba(255, 255, 255, 0.3);">
+       <div class="calculation-row"><span style="font-size: 18px;">Gross Revenue:</span> <span id="grossRevenue" style="font-size: 18px; font-weight: 700;">$0.00</span>
+       </div>
+       <div class="calculation-row"><span style="font-size: 18px;">Cost of Goods Sold:</span> <span id="cogsTotal" style="font-size: 18px; font-weight: 700;">$0.00</span>
+       </div>
+       <div class="calculation-row"><span style="font-size: 18px;">Total Business Expenses:</span> <span id="totalBusinessExpenses" style="font-size: 18px; font-weight: 700;">$0.00</span>
+       </div>
+       <div class="calculation-row"><span style="font-size: 18px; font-weight: 700;">Net Business Income:</span> <span id="netBusinessIncome" style="font-size: 18px; font-weight: 700;">$0.00</span>
+       </div>
+      </div>
+      <div style="margin-top: 24px; padding: 16px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; font-size: 14px; line-height: 1.6;">
+       💡 <strong>Tax Optimization Tips:</strong><br><span id="taxTips"></span>
+      </div><button id="saveBtn" style="width: 100%; margin-top: 24px; background: white; color: #667eea; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600; border: none; cursor: pointer; transition: transform 0.2s;"> Save This Calculation </button>
+     </div><!-- Saved Calculations -->
+     <div id="savedCalculations" style="margin-top: 32px;"></div>
+    </div><!-- Disclaimer -->
+    <div style="margin-top: 40px; padding: 20px; background: white; border-radius: 12px; border-left: 4px solid #f59e0b;">
+     <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;"><strong style="color: #0f172a;">⚠️ Important Disclaimer:</strong> This calculator provides estimates for educational purposes only. Tax laws are complex and change frequently. Actual tax liability may vary based on numerous factors including state/provincial taxes, AMT, phase-outs, and credits not included here. Always consult with a qualified CPA, tax attorney, or certified tax professional for personalized advice. This tool does not constitute professional tax advice.</p>
+    </div>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      app_title: 'Professional Tax Estimator',
+      tagline: 'US & Canada Tax Calculator',
+      background_color: '#f8fafc',
+      surface_color: '#ffffff',
+      text_color: '#0f172a',
+      primary_color: '#667eea',
+      secondary_color: '#64748b'
+    };
+
+    let savedCalculationsData = [];
+
+    const dataHandler = {
+      onDataChanged(data) {
+        savedCalculationsData = data;
+        renderSavedCalculations();
+      }
+    };
+
+    async function initializeApp() {
+      if (window.dataSdk) {
+        const initResult = await window.dataSdk.init(dataHandler);
+        if (!initResult.isOk) {
+          console.error('Failed to initialize data SDK');
+        }
+      }
+
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange: async (config) => {
+            document.getElementById('mainTitle').textContent = config.app_title || defaultConfig.app_title;
+            document.getElementById('tagline').textContent = config.tagline || defaultConfig.tagline;
+            
+            const customFont = config.font_family || defaultConfig.font_family || 'Inter';
+            const baseFontStack = '-apple-system, BlinkMacSystemFont, sans-serif';
+            document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+            
+            const baseSize = config.font_size || 16;
+            document.getElementById('mainTitle').style.fontSize = `${baseSize * 3}px`;
+            document.getElementById('tagline').style.fontSize = `${baseSize * 1.25}px`;
+            
+            document.getElementById('app').style.background = `linear-gradient(to bottom right, ${config.background_color || defaultConfig.background_color}, ${config.secondary_color || defaultConfig.secondary_color})`;
+            
+            const sections = document.querySelectorAll('.section-card');
+            sections.forEach(section => {
+              section.style.background = config.surface_color || defaultConfig.surface_color;
+            });
+            
+            document.querySelectorAll('h1, h2, h3, label, p').forEach(el => {
+              if (!el.closest('.summary-card')) {
+                el.style.color = config.text_color || defaultConfig.text_color;
+              }
+            });
+            
+            document.getElementById('calculateBtn').style.background = `linear-gradient(135deg, ${config.primary_color || defaultConfig.primary_color} 0%, #764ba2 100%)`;
+            
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab) {
+              activeTab.style.background = config.primary_color || defaultConfig.primary_color;
+              activeTab.style.borderColor = config.primary_color || defaultConfig.primary_color;
+            }
+          },
+          mapToCapabilities: (config) => ({
+            recolorables: [
+              {
+                get: () => config.background_color || defaultConfig.background_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.setConfig({ background_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.surface_color || defaultConfig.surface_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.setConfig({ surface_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.text_color || defaultConfig.text_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.setConfig({ text_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.primary_color || defaultConfig.primary_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.setConfig({ primary_color: value });
+                  }
+                }
+              },
+              {
+                get: () => config.secondary_color || defaultConfig.secondary_color,
+                set: (value) => {
+                  if (window.elementSdk) {
+                    window.elementSdk.setConfig({ secondary_color: value });
+                  }
+                }
+              }
+            ],
+            borderables: [],
+            fontEditable: {
+              get: () => config.font_family || defaultConfig.font_family || 'Inter',
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.setConfig({ font_family: value });
+                }
+              }
+            },
+            fontSizeable: {
+              get: () => config.font_size || 16,
+              set: (value) => {
+                if (window.elementSdk) {
+                  window.elementSdk.setConfig({ font_size: value });
+                }
+              }
+            }
+          }),
+          mapToEditPanelValues: (config) => new Map([
+            ['app_title', config.app_title || defaultConfig.app_title],
+            ['tagline', config.tagline || defaultConfig.tagline]
+          ])
+        });
+      }
+    }
+
+    // Tab switching
+    document.getElementById('personalBtn').addEventListener('click', () => {
+      document.getElementById('personalBtn').classList.add('active');
+      document.getElementById('businessBtn').classList.remove('active');
+      document.getElementById('personalForm').style.display = 'block';
+      document.getElementById('businessForm').style.display = 'none';
+      
+      const config = window.elementSdk?.config || defaultConfig;
+      document.getElementById('personalBtn').style.background = config.primary_color || defaultConfig.primary_color;
+      document.getElementById('personalBtn').style.borderColor = config.primary_color || defaultConfig.primary_color;
+      document.getElementById('personalBtn').style.color = 'white';
+      document.getElementById('businessBtn').style.background = 'white';
+      document.getElementById('businessBtn').style.borderColor = '#cbd5e1';
+      document.getElementById('businessBtn').style.color = '#64748b';
+    });
+
+    document.getElementById('businessBtn').addEventListener('click', () => {
+      document.getElementById('businessBtn').classList.add('active');
+      document.getElementById('personalBtn').classList.remove('active');
+      document.getElementById('businessForm').style.display = 'block';
+      document.getElementById('personalForm').style.display = 'none';
+      
+      const config = window.elementSdk?.config || defaultConfig;
+      document.getElementById('businessBtn').style.background = config.primary_color || defaultConfig.primary_color;
+      document.getElementById('businessBtn').style.borderColor = config.primary_color || defaultConfig.primary_color;
+      document.getElementById('businessBtn').style.color = 'white';
+      document.getElementById('personalBtn').style.background = 'white';
+      document.getElementById('personalBtn').style.borderColor = '#cbd5e1';
+      document.getElementById('personalBtn').style.color = '#64748b';
+    });
+
+    // Standard deduction toggle
+    document.getElementById('standardDeduction').addEventListener('change', (e) => {
+      document.getElementById('itemizedSection').style.display = e.target.checked ? 'none' : 'block';
+    });
+
+    // Calculate button
+    document.getElementById('calculateBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('calculateBtn');
+      btn.disabled = true;
+      btn.innerHTML = 'Calculating... <span class="loader"></span>';
+      
+      const country = document.getElementById('country').value;
+      const isPersonal = document.getElementById('personalForm').style.display === 'block';
+      
+      if (isPersonal) {
+        await calculatePersonalTax(country);
+      } else {
+        await calculateBusinessTax(country);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = 'Calculate Tax Estimate';
+      document.getElementById('results').style.display = 'block';
+      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    async function calculatePersonalTax(country) {
+      const wages = parseFloat(document.getElementById('wages').value) || 0;
+      const interest = parseFloat(document.getElementById('interest').value) || 0;
+      const dividends = parseFloat(document.getElementById('dividends').value) || 0;
+      const capitalGains = parseFloat(document.getElementById('capitalGains').value) || 0;
+      const selfEmployment = parseFloat(document.getElementById('selfEmployment').value) || 0;
+      const rentalIncome = parseFloat(document.getElementById('rentalIncome').value) || 0;
+      const retirement = parseFloat(document.getElementById('retirement').value) || 0;
+      const socialSecurity = parseFloat(document.getElementById('socialSecurity').value) || 0;
+      const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
+      
+      const totalIncome = wages + interest + dividends + capitalGains + selfEmployment + 
+                          rentalIncome + retirement + socialSecurity + otherIncome;
+      
+      const filingStatus = document.getElementById('filingStatus').value;
+      const useStandard = document.getElementById('standardDeduction').checked;
+      const dependents = parseInt(document.getElementById('dependents').value) || 0;
+      
+      let deductions = 0;
+      
+      if (useStandard) {
+        if (country === 'us') {
+          switch(filingStatus) {
+            case 'single': deductions = 14600; break;
+            case 'married_joint': deductions = 29200; break;
+            case 'married_separate': deductions = 14600; break;
+            case 'head': deductions = 21900; break;
+          }
+        } else {
+          deductions = 15000;
+        }
+      } else {
+        const mortgage = parseFloat(document.getElementById('mortgageInterest').value) || 0;
+        const propertyTax = parseFloat(document.getElementById('propertyTax').value) || 0;
+        const charitable = parseFloat(document.getElementById('charitableDonations').value) || 0;
+        const medical = parseFloat(document.getElementById('medicalExpenses').value) || 0;
+        
+        deductions = mortgage + Math.min(propertyTax, 10000) + charitable + Math.max(medical - (totalIncome * 0.075), 0);
+      }
+      
+      deductions += parseFloat(document.getElementById('retirementContrib').value) || 0;
+      deductions += parseFloat(document.getElementById('hsaContrib').value) || 0;
+      deductions += parseFloat(document.getElementById('studentLoanInterest').value) || 0;
+      
+      const childcareExpenses = parseFloat(document.getElementById('childcareExpenses').value) || 0;
+      const educationExpenses = parseFloat(document.getElementById('educationExpenses').value) || 0;
+      
+      const selfEmploymentTax = selfEmployment * 0.153;
+      deductions += selfEmploymentTax / 2;
+      
+      const taxableIncome = Math.max(totalIncome - deductions, 0);
+      
+      let tax = 0;
+      if (country === 'us') {
+        if (filingStatus === 'single') {
+          if (taxableIncome <= 11600) tax = taxableIncome * 0.10;
+          else if (taxableIncome <= 47150) tax = 1160 + (taxableIncome - 11600) * 0.12;
+          else if (taxableIncome <= 100525) tax = 5426 + (taxableIncome - 47150) * 0.22;
+          else if (taxableIncome <= 191950) tax = 17168.50 + (taxableIncome - 100525) * 0.24;
+          else if (taxableIncome <= 243725) tax = 39110.50 + (taxableIncome - 191950) * 0.32;
+          else if (taxableIncome <= 609350) tax = 55678.50 + (taxableIncome - 243725) * 0.35;
+          else tax = 183647.25 + (taxableIncome - 609350) * 0.37;
+        } else if (filingStatus === 'married_joint') {
+          if (taxableIncome <= 23200) tax = taxableIncome * 0.10;
+          else if (taxableIncome <= 94300) tax = 2320 + (taxableIncome - 23200) * 0.12;
+          else if (taxableIncome <= 201050) tax = 10852 + (taxableIncome - 94300) * 0.22;
+          else if (taxableIncome <= 383900) tax = 34337 + (taxableIncome - 201050) * 0.24;
+          else if (taxableIncome <= 487450) tax = 78221 + (taxableIncome - 383900) * 0.32;
+          else if (taxableIncome <= 731200) tax = 111357 + (taxableIncome - 487450) * 0.35;
+          else tax = 196669.50 + (taxableIncome - 731200) * 0.37;
+        }
+        
+        tax += selfEmploymentTax;
+        
+        const childTaxCredit = Math.min(dependents * 2000, tax);
+        tax -= childTaxCredit;
+        
+        const childcareCredit = Math.min(childcareExpenses * 0.35, dependents > 1 ? 2100 : 1050);
+        tax -= childcareCredit;
+        
+        const educationCredit = Math.min(educationExpenses, 2500);
+        tax -= educationCredit;
+      } else {
+        const federalTax = calculateCanadianFederalTax(taxableIncome);
+        const provincialTax = federalTax * 0.5;
+        tax = federalTax + provincialTax;
+        
+        const childcareDeduction = Math.min(childcareExpenses, dependents * 8000);
+        const educationCredit = educationExpenses * 0.15;
+        tax -= educationCredit;
+      }
+      
+      tax = Math.max(tax, 0);
+      
+      document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('totalDeductions').textContent = '$' + deductions.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('taxableIncome').textContent = '$' + taxableIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('estimatedTax').textContent = '$' + tax.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('effectiveRate').textContent = totalIncome > 0 ? ((tax / totalIncome) * 100).toFixed(1) + '%' : '0.0%';
+      
+      document.getElementById('businessSummary').style.display = 'none';
+      
+      generateTaxTips(country, totalIncome, deductions, tax, true);
+    }
+
+    function calculateCanadianFederalTax(income) {
+      let tax = 0;
+      if (income <= 55867) {
+        tax = income * 0.15;
+      } else if (income <= 111733) {
+        tax = 8380.05 + (income - 55867) * 0.205;
+      } else if (income <= 173205) {
+        tax = 19829.89 + (income - 111733) * 0.26;
+      } else if (income <= 246752) {
+        tax = 35812.61 + (income - 173205) * 0.29;
+      } else {
+        tax = 57144.98 + (income - 246752) * 0.33;
+      }
+      return tax;
+    }
+
+    async function calculateBusinessTax(country) {
+      const grossReceipts = parseFloat(document.getElementById('grossReceipts').value) || 0;
+      const returnsAllowances = parseFloat(document.getElementById('returnsAllowances').value) || 0;
+      const otherBusinessIncome = parseFloat(document.getElementById('otherBusinessIncome').value) || 0;
+      
+      const beginningInventory = parseFloat(document.getElementById('beginningInventory').value) || 0;
+      const purchases = parseFloat(document.getElementById('purchases').value) || 0;
+      const laborCosts = parseFloat(document.getElementById('laborCosts').value) || 0;
+      const endingInventory = parseFloat(document.getElementById('endingInventory').value) || 0;
+      
+      const cogs = beginningInventory + purchases + laborCosts - endingInventory;
+      
+      const advertising = parseFloat(document.getElementById('advertising').value) || 0;
+      const vehicleExpenses = parseFloat(document.getElementById('vehicleExpenses').value) || 0;
+      const officeExpenses = parseFloat(document.getElementById('officeExpenses').value) || 0;
+      const rentLease = parseFloat(document.getElementById('rentLease').value) || 0;
+      const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+      const insurance = parseFloat(document.getElementById('insurance').value) || 0;
+      const professionalFees = parseFloat(document.getElementById('professionalFees').value) || 0;
+      const wages = parseFloat(document.getElementById('wages').value) || 0;
+      const repairs = parseFloat(document.getElementById('repairs').value) || 0;
+      const travel = parseFloat(document.getElementById('travel').value) || 0;
+      const depreciation = parseFloat(document.getElementById('depreciation').value) || 0;
+      const businessInterest = parseFloat(document.getElementById('businessInterest').value) || 0;
+      const otherExpenses = parseFloat(document.getElementById('otherExpenses').value) || 0;
+      const homeOffice = parseFloat(document.getElementById('homeOffice').value) || 0;
+      
+      const totalExpenses = advertising + vehicleExpenses + officeExpenses + rentLease + utilities + 
+                           insurance + professionalFees + wages + repairs + travel + depreciation + 
+                           businessInterest + otherExpenses + homeOffice;
+      
+      const grossRevenue = grossReceipts - returnsAllowances + otherBusinessIncome;
+      const grossProfit = grossRevenue - cogs;
+      const netBusinessIncome = grossProfit - totalExpenses;
+      
+      const businessType = document.getElementById('businessType').value;
+      let taxRate = 0.21;
+      
+      if (country === 'us') {
+        if (businessType === 'c_corp') {
+          taxRate = 0.21;
+        } else {
+          taxRate = 0.24;
+        }
+      } else {
+        if (businessType === 'c_corp') {
+          taxRate = 0.15;
+        } else {
+          taxRate = 0.20;
+        }
+      }
+      
+      const estimatedTax = Math.max(netBusinessIncome * taxRate, 0);
+      
+      document.getElementById('totalIncome').textContent = '$' + grossRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('totalDeductions').textContent = '$' + (cogs + totalExpenses).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('taxableIncome').textContent = '$' + Math.max(netBusinessIncome, 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('estimatedTax').textContent = '$' + estimatedTax.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('effectiveRate').textContent = grossRevenue > 0 ? ((estimatedTax / grossRevenue) * 100).toFixed(1) + '%' : '0.0%';
+      
+      document.getElementById('businessSummary').style.display = 'block';
+      document.getElementById('grossRevenue').textContent = '$' + grossRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('cogsTotal').textContent = '$' + cogs.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('totalBusinessExpenses').textContent = '$' + totalExpenses.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      document.getElementById('netBusinessIncome').textContent = '$' + netBusinessIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      
+      generateTaxTips(country, grossRevenue, totalExpenses, estimatedTax, false);
+    }
+
+    function generateTaxTips(country, income, deductions, tax, isPersonal) {
+      const tips = [];
+      
+      if (isPersonal) {
+        if (country === 'us') {
+          tips.push('Maximize retirement contributions (401k/IRA) to reduce taxable income');
+          tips.push('Consider HSA contributions for triple tax benefits');
+          tips.push('Track charitable donations and keep receipts');
+          tips.push('Review if itemizing deductions would save more than standard deduction');
+        } else {
+          tips.push('Maximize RRSP contributions - 18% of income up to $31,560');
+          tips.push('Utilize TFSA for tax-free investment growth');
+          tips.push('Claim all eligible medical expenses over 3% of income');
+          tips.push('Take advantage of federal and provincial education credits');
+        }
+      } else {
+        tips.push('Keep detailed records of all expenses - documentation is critical');
+        tips.push('Consider Section 179 or bonus depreciation for equipment purchases');
+        tips.push('Track vehicle mileage daily for maximum deduction');
+        tips.push('Home office deduction can provide significant savings if qualified');
+        tips.push('Hire family members to shift income to lower tax brackets');
+        tips.push('Consider retirement plans like SEP-IRA or Solo 401k for self-employed');
+      }
+      
+      document.getElementById('taxTips').innerHTML = tips.join('<br>• ');
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', async () => {
+      if (!window.dataSdk) return;
+      
+      if (savedCalculationsData.length >= 999) {
+        const tipsEl = document.getElementById('taxTips');
+        tipsEl.innerHTML = '<strong style="color: #fef3c7;">⚠️ Maximum limit of 999 saved calculations reached. Please delete some before saving new ones.</strong>';
+        return;
+      }
+      
+      const btn = document.getElementById('saveBtn');
+      btn.disabled = true;
+      btn.innerHTML = 'Saving... <span class="loader"></span>';
+      
+      const country = document.getElementById('country').value;
+      const isPersonal = document.getElementById('personalForm').style.display === 'block';
+      
+      const calculation = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        timestamp: new Date().toISOString(),
+        country: country === 'us' ? 'United States' : 'Canada',
+        tax_type: isPersonal ? 'Personal' : 'Business',
+        filing_status: isPersonal ? document.getElementById('filingStatus').value : document.getElementById('businessType').value,
+        total_income: parseFloat(document.getElementById('totalIncome').textContent.replace(/[$,]/g, '')),
+        total_deductions: parseFloat(document.getElementById('totalDeductions').textContent.replace(/[$,]/g, '')),
+        taxable_income: parseFloat(document.getElementById('taxableIncome').textContent.replace(/[$,]/g, '')),
+        estimated_tax: parseFloat(document.getElementById('estimatedTax').textContent.replace(/[$,]/g, '')),
+        effective_rate: parseFloat(document.getElementById('effectiveRate').textContent.replace('%', ''))
+      };
+      
+      const result = await window.dataSdk.create(calculation);
+      
+      if (result.isOk) {
+        btn.textContent = '✓ Saved Successfully!';
+        setTimeout(() => {
+          btn.textContent = 'Save This Calculation';
+          btn.disabled = false;
+        }, 2000);
+      } else {
+        btn.textContent = 'Error Saving';
+        setTimeout(() => {
+          btn.textContent = 'Save This Calculation';
+          btn.disabled = false;
+        }, 2000);
+      }
+    });
+
+    function renderSavedCalculations() {
+      if (savedCalculationsData.length === 0) return;
+      
+      const container = document.getElementById('savedCalculations');
+      container.innerHTML = '<h3 style="font-size: 24px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Saved Calculations</h3>';
+      
+      savedCalculationsData.slice().reverse().forEach(calc => {
+        const card = document.createElement('div');
+        card.className = 'section-card';
+        card.style.marginBottom = '16px';
+        
+        const date = new Date(calc.timestamp);
+        const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="flex: 1;">
+              <div style="font-weight: 600; font-size: 18px; color: #0f172a; margin-bottom: 8px;">
+                ${calc.country} - ${calc.tax_type} Tax
+              </div>
+              <div style="font-size: 14px; color: #64748b; margin-bottom: 12px;">
+                ${formattedDate}
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px;">
+                <div><strong>Income:</strong> $${calc.total_income.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                <div><strong>Deductions:</strong> $${calc.total_deductions.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                <div><strong>Tax:</strong> $${calc.estimated_tax.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                <div><strong>Rate:</strong> ${calc.effective_rate.toFixed(1)}%</div>
+              </div>
+            </div>
+            <button class="delete-btn" data-id="${calc.__backendId}" style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 600;">
+              Delete
+            </button>
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
+      
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = e.target.getAttribute('data-id');
+          const calculation = savedCalculationsData.find(c => c.__backendId === id);
+          if (!calculation) return;
+          
+          btn.disabled = true;
+          btn.textContent = 'Deleting...';
+          
+          const result = await window.dataSdk.delete(calculation);
+          
+          if (!result.isOk) {
+            btn.textContent = 'Error';
+            setTimeout(() => {
+              btn.textContent = 'Delete';
+              btn.disabled = false;
+            }, 2000);
+          }
+        });
+      });
+    }
+
+    initializeApp();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c5a4e2af014a26c',t:'MTc2OTcwNjIzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
