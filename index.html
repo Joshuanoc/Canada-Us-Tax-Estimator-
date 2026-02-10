@@ -1,1008 +1,1179 @@
 <!doctype html>
-<html lang="en" class="h-full">
+<html lang="en">
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Professional Tax Estimator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/_sdk/data_sdk.js"></script>
+  <title>Tax Estimator</title>
   <script src="/_sdk/element_sdk.js"></script>
   <style>
     body {
       box-sizing: border-box;
     }
-    
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-    
-    * {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
     }
-    
-    .input-group {
-      margin-bottom: 1rem;
+
+    body {
+      font-family: 'Inter', 'Helvetica Neue', sans-serif;
+      background: radial-gradient(ellipse at 20% 50%, rgba(13, 110, 253, 0.15) 0%, transparent 50%), 
+                  radial-gradient(ellipse at 80% 80%, rgba(111, 66, 193, 0.15) 0%, transparent 50%),
+                  linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
+      background-attachment: fixed;
+      overflow: auto;
+      color: #e0e0e0;
     }
-    
-    .tooltip {
-      position: relative;
-      display: inline-block;
-      cursor: help;
-    }
-    
-    .tooltip .tooltiptext {
-      visibility: hidden;
-      width: 280px;
-      background-color: #1e293b;
-      color: #fff;
-      text-align: left;
-      border-radius: 6px;
-      padding: 8px 12px;
-      position: absolute;
-      z-index: 1000;
-      bottom: 125%;
-      left: 50%;
-      margin-left: -140px;
-      opacity: 0;
-      transition: opacity 0.3s;
-      font-size: 13px;
-      line-height: 1.4;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    
-    .tooltip .tooltiptext::after {
-      content: "";
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #1e293b transparent transparent transparent;
-    }
-    
-    .tooltip:hover .tooltiptext {
-      visibility: visible;
-      opacity: 1;
-    }
-    
-    .section-card {
-      background: white;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 20px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    }
-    
-    .tab-button {
-      transition: all 0.2s;
-    }
-    
-    .tab-button.active {
-      border-bottom: 3px solid;
-    }
-    
-    input[type="number"], input[type="text"], select {
-      transition: all 0.2s;
-      padding: 10px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
+
+    #app-wrapper {
       width: 100%;
-      box-sizing: border-box;
+      height: 100%;
+      padding: 60px 20px;
+      overflow: auto;
     }
-    
-    input[type="number"]:focus, input[type="text"]:focus, select:focus {
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+      animation: glitchIn 0.8s ease-out;
+      position: relative;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(30px);
+    }
+
+    .header h1 {
+      font-size: 3.2em;
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #00d4ff 0%, #0099ff 25%, #6366f1 50%, #a855f7 75%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 40px rgba(0, 212, 255, 0.2);
+      animation: textShimmer 3s infinite;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      margin: 12px 0 0 0;
+      opacity: 0.7;
+      font-weight: 300;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #00d4ff;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+      animation: cardSlideIn 0.6s ease-out forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #00d4ff;
+      font-size: 0.95em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid rgba(0, 212, 255, 0.2);
+      border-radius: 10px;
+      font-size: 1em;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.02);
+      color: #e0e0e0;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
       outline: none;
-      border-width: 2px;
-      border-color: #667eea;
+      border-color: #00d4ff;
+      background: rgba(0, 212, 255, 0.05);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.3), inset 0 0 10px rgba(0, 212, 255, 0.1);
+      transform: translateY(-2px);
     }
-    
-    .summary-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    .input-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .input-group {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tab-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .tab-btn {
+      padding: 16px 20px;
+      border: 2px solid rgba(0, 212, 255, 0.2);
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1em;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      color: #a0a0a0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(111, 66, 193, 0.15) 100%);
+      color: #00d4ff;
+      border-color: #00d4ff;
+      transform: translateY(-3px);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.1);
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      accent-color: #00d4ff;
+    }
+
+    .checkbox-label {
+      margin: 0;
+      cursor: pointer;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+
+    .section-title {
+      font-size: 1.25em;
+      font-weight: 700;
+      color: #00d4ff;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(0, 212, 255, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .calc-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #00d4ff 0%, #0099ff 50%, #6366f1 100%);
+      color: #0a0e27;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.15em;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-top: 24px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+    }
+
+    .calc-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+    }
+
+    .results-section {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(111, 66, 193, 0.1) 100%);
+      border: 2px solid rgba(0, 212, 255, 0.3);
       border-radius: 16px;
       padding: 32px;
-      color: white;
-      box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+      color: #e0e0e0;
+      animation: resultsPulse 0.8s ease-out;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
     }
-    
-    .calculation-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+
+    .results-section h2 {
+      margin-top: 0;
+      margin-bottom: 28px;
+      font-size: 1.8em;
+      color: #00d4ff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    
-    .calculation-row:last-child {
+
+    .result-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    .result-row:last-child {
       border-bottom: none;
     }
-    
-    .loader {
-      border: 3px solid #f3f4f6;
-      border-top: 3px solid #667eea;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      animation: spin 1s linear infinite;
-      display: inline-block;
-      margin-left: 8px;
+
+    .result-label {
+      font-weight: 600;
+      opacity: 0.8;
+      color: #a0a0a0;
     }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+
+    .result-value {
+      font-weight: 800;
+      font-size: 1.2em;
+      text-align: right;
+      color: #00d4ff;
+    }
+
+    .disclaimer {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      padding: 18px;
+      border-radius: 10px;
+      margin-top: 24px;
+      font-size: 0.9em;
+      color: #fcd34d;
+      line-height: 1.6;
+      backdrop-filter: blur(10px);
+    }
+
+    @keyframes glitchIn {
+      0% { opacity: 0; transform: translateY(-30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes cardSlideIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes textShimmer {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; }
+    }
+
+    @keyframes resultsPulse {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .optimization-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .optimization-tabs {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .optimization-tabs {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .opt-tab {
+      padding: 12px 16px;
+      background: rgba(0, 212, 255, 0.05);
+      border: 1.5px solid rgba(0, 212, 255, 0.15);
+      border-radius: 8px;
+      color: rgba(224, 224, 224, 0.6);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9em;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .opt-tab.active {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
+      border-color: #00d4ff;
+      color: #00d4ff;
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    }
+
+    .opt-content {
+      display: none;
+    }
+
+    .opt-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .pro-tip {
+      background: rgba(236, 72, 153, 0.05);
+      border-left: 4px solid #ec4899;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-top: 16px;
+      font-size: 0.85em;
+      color: #fda4d1;
+      line-height: 1.5;
+    }
+
+    .tax-savings-indicator {
+      background: rgba(34, 197, 94, 0.1);
+      border: 2px solid rgba(34, 197, 94, 0.3);
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .savings-amount {
+      font-size: 1.8em;
+      font-weight: 800;
+      color: #22c55e;
+      margin: 8px 0;
+    }
+
+    .savings-label {
+      color: rgba(224, 224, 224, 0.7);
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
  </head>
- <body class="h-full">
-  <div id="app" class="h-full w-full" style="background: linear-gradient(to bottom right, #f8fafc, #e2e8f0); overflow:auto;">
-   <div style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;"><!-- Header -->
-    <div style="text-align: center; margin-bottom: 40px;">
-     <h1 id="mainTitle" style="font-size: 48px; font-weight: 700; margin-bottom: 8px; color: #0f172a;">Professional Tax Estimator</h1>
-     <p id="tagline" style="font-size: 20px; color: #64748b;">US &amp; Canada Tax Calculator</p>
-    </div><!-- Country Selection -->
-    <div class="section-card">
-      <label for="country" style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155;">Select Country</label>
-      <select id="country" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
-        <option value="us">United States</option>
-        <option value="ca">Canada</option>
-      </select>
-
-      <!-- State / Province select (added) -->
-      <div style="margin-top:12px;">
-        <label for="subRegion" style="display: block; font-weight: 600; margin-bottom: 8px; color: #334155;">State / Province</label>
-        <select id="subRegion" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
-          <option value="">Select state / province</option>
-          <!-- options populated by JS when country changes -->
-        </select>
-      </div>
-    </div><!-- Tax Type Selection -->
-    <div class="section-card">
-      <label style="display: block; font-weight: 600; margin-bottom: 12px; color: #334155;">Tax Type</label>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <button id="personalBtn" class="tab-button active" style="padding: 16px; border: 2px solid #667eea; border-radius: 8px; font-weight: 600; background:#667eea; color:white; cursor:pointer;">Personal</button>
-        <button id="businessBtn" class="tab-button" style="padding: 16px; border: 2px solid #cbd5e1; border-radius: 8px; font-weight: 600; background:white; color:#64748b; cursor:pointer;">Business</button>
-      </div>
-    </div><!-- Personal Tax Form -->
-    <div id="personalForm" style="display: block;"><!-- Filing Status -->
-     <div class="section-card">
-      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Filing Status</h3>
-      <label for="filingStatus" style="display: block; font-weight: 500; margin-bottom: 8px; color: #334155;">Filing Status</label>
-      <select id="filingStatus" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px;">
-        <option value="single">Single</option>
-        <option value="married_joint">Married Filing Jointly</option>
-        <option value="married_separate">Married Filing Separately</option>
-        <option value="head">Head of Household</option>
-      </select>
-     </div><!-- Income Section -->
-     <div class="section-card">
-      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Income Sources</h3>
-      <div class="input-group">
-        <label for="wages" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Wages, Salaries, Tips (W-2/T4)</label>
-        <input id="wages" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="interest" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Interest Income</label>
-        <input id="interest" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="dividends" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Dividend Income</label>
-        <input id="dividends" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="capitalGains" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Capital Gains/Losses</label>
-        <input id="capitalGains" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="selfEmployment" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Self-Employment Income</label>
-        <input id="selfEmployment" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="rentalIncome" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Rental Income (Net)</label>
-        <input id="rentalIncome" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="retirement" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Retirement Distributions (IRA/401k/RRSP)</label>
-        <input id="retirement" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="socialSecurity" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Social Security/CPP Benefits</label>
-        <input id="socialSecurity" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="otherIncome" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Other Income</label>
-        <input id="otherIncome" type="number" placeholder="0.00" />
-      </div>
-     </div><!-- Deductions Section -->
-     <div class="section-card">
-      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Deductions &amp; Credits</h3>
-      <div class="input-group">
-        <label style="display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="standardDeduction" checked />
-          <span style="font-weight:500; color:#334155;">Use Standard Deduction</span>
-        </label>
-      </div>
-      <div id="itemizedSection" style="display: none;">
-       <div class="input-group">
-         <label for="mortgageInterest" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Mortgage Interest</label>
-         <input id="mortgageInterest" type="number" placeholder="0.00" />
-       </div>
-       <div class="input-group">
-         <label for="propertyTax" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">State/Property Taxes (SALT)</label>
-         <input id="propertyTax" type="number" placeholder="0.00" />
-       </div>
-       <div class="input-group">
-         <label for="charitableDonations" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Charitable Donations</label>
-         <input id="charitableDonations" type="number" placeholder="0.00" />
-       </div>
-       <div class="input-group">
-         <label for="medicalExpenses" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Medical Expenses</label>
-         <input id="medicalExpenses" type="number" placeholder="0.00" />
-       </div>
-      </div>
-      <div class="input-group">
-        <label for="retirementContrib" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Retirement Contributions (IRA/RRSP)</label>
-        <input id="retirementContrib" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="hsaContrib" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">HSA Contributions (US Only)</label>
-        <input id="hsaContrib" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="studentLoanInterest" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Student Loan Interest</label>
-        <input id="studentLoanInterest" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="childcareExpenses" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Childcare Expenses</label>
-        <input id="childcareExpenses" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="educationExpenses" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Education Expenses</label>
-        <input id="educationExpenses" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="dependents" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Number of Dependents</label>
-        <input id="dependents" type="number" placeholder="0" />
+ <body>
+  <div id="app-wrapper">
+   <div class="container">
+    <div class="header">
+     <h1 id="mainTitle">Professional Tax Estimator</h1>
+     <p id="subtitle">US &amp; Canada Tax Calculator</p>
+    </div>
+    <div class="card">
+     <div class="form-group"><label for="country">Select Country</label> <select id="country"> <option value="us">United States</option> <option value="ca">Canada</option> </select>
+     </div>
+     <div class="form-group"><label for="subRegion">State / Province</label> <select id="subRegion"> <option value="">Select state / province</option> </select>
+     </div>
+    </div>
+    <div class="card">
+     <div class="form-group"><label>Tax Type</label>
+      <div class="tab-buttons"><button id="personalBtn" class="tab-btn active">Personal</button> <button id="businessBtn" class="tab-btn">Business</button>
       </div>
      </div>
-    </div><!-- Business Tax Form -->
-    <div id="businessForm" style="display: none;"><!-- Business Type -->
-     <div class="section-card">
-      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Business Information</h3>
-      <div class="input-group">
-        <label for="businessType" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Business Entity Type</label>
-        <select id="businessType">
-          <option value="sole">Sole Proprietorship</option>
-          <option value="partnership">Partnership</option>
-          <option value="c_corp">C-Corp</option>
-          <option value="s_corp">S-Corp</option>
-          <option value="llc">LLC</option>
-        </select>
+    </div>
+    <div id="personalFormSection">
+     <div class="card">
+      <div class="section-title">
+       Filing Status
       </div>
-      <div class="input-group">
-        <label for="businessIndustry" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Industry</label>
-        <select id="businessIndustry">
-          <option value="other">Other</option>
-          <option value="tech">Technology</option>
-          <option value="retail">Retail</option>
-          <option value="services">Services</option>
-        </select>
+      <div class="form-group"><select id="personalFilingStatus"> <option value="single">Single</option> <option value="married_joint">Married Filing Jointly</option> <option value="married_separate">Married Filing Separately</option> <option value="head">Head of Household</option> </select>
       </div>
-     </div><!-- Business Revenue -->
-     <div class="section-card">
-      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Revenue</h3>
-      <div class="input-group">
-        <label for="grossReceipts" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Gross Receipts/Sales</label>
-        <input id="grossReceipts" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="returnsAllowances" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Returns &amp; Allowances</label>
-        <input id="returnsAllowances" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="otherBusinessIncome" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Other Business Income</label>
-        <input id="otherBusinessIncome" type="number" placeholder="0.00" />
-      </div>
-     </div><!-- Cost of Goods Sold -->
-     <div class="section-card">
-      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Cost of Goods Sold (COGS)</h3>
-      <div class="input-group">
-        <label for="beginningInventory" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Beginning Inventory</label>
-        <input id="beginningInventory" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="purchases" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Purchases</label>
-        <input id="purchases" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="laborCosts" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Direct Labor Costs</label>
-        <input id="laborCosts" type="number" placeholder="0.00" />
-      </div>
-      <div class="input-group">
-        <label for="endingInventory" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Ending Inventory</label>
-        <input id="endingInventory" type="number" placeholder="0.00" />
-      </div>
-     </div><!-- Business Expenses -->
-     <div class="section-card">
-      <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Business Expenses</h3>
-      <div class="input-group"><label for="advertising" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Advertising &amp; Marketing</label><input id="advertising" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="vehicleExpenses" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Vehicle Expenses</label><input id="vehicleExpenses" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="officeExpenses" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Office Expenses &amp; Supplies</label><input id="officeExpenses" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="rentLease" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Rent/Lease Payments</label><input id="rentLease" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="utilities" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Utilities</label><input id="utilities" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="insurance" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Insurance (Business)</label><input id="insurance" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="professionalFees" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Professional Fees</label><input id="professionalFees" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="wages" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Employee Wages &amp; Benefits</label><input id="wages" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="repairs" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Repairs &amp; Maintenance</label><input id="repairs" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="travel" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Travel &amp; Meals</label><input id="travel" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="depreciation" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Depreciation</label><input id="depreciation" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="businessInterest" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Interest (Business Loans)</label><input id="businessInterest" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="otherExpenses" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Other Business Expenses</label><input id="otherExpenses" type="number" placeholder="0.00" /></div>
-      <div class="input-group"><label for="homeOffice" style="display:block; font-weight:500; margin-bottom:8px; color:#334155;">Home Office Deduction</label><input id="homeOffice" type="number" placeholder="0.00" /></div>
      </div>
-    </div><!-- Calculate Button -->
-    <div style="text-align: center; margin: 32px 0;">
-      <button id="calculateBtn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px 48px; border-radius: 12px; border:none; font-size:16px; font-weight:600; cursor:pointer;">
-        Calculate Tax Estimate
-      </button>
-    </div><!-- Results Section -->
-    <div id="results" style="display: none;">
-     <div class="summary-card">
-      <h2 style="font-size: 32px; font-weight: 700; margin-bottom: 24px; text-align: center;">Tax Calculation Summary</h2>
-      <div class="calculation-row"><span style="font-size: 18px;">Total Income:</span> <span id="totalIncome" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
-      <div class="calculation-row"><span style="font-size: 18px;">Total Deductions:</span> <span id="totalDeductions" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
-      <div class="calculation-row"><span style="font-size: 18px;">Taxable Income:</span> <span id="taxableIncome" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
-      <div class="calculation-row" style="border-top: 2px solid white; padding-top: 16px; margin-top: 16px;"><span style="font-size: 24px; font-weight: 700;">Estimated Tax:</span> <span id="estimatedTax" style="font-size: 24px; font-weight: 700;">$0.00</span></div>
-      <div class="calculation-row"><span style="font-size: 18px;">Effective Tax Rate:</span> <span id="effectiveRate" style="font-size: 18px; font-weight: 700;">0.0%</span></div>
-      <div class="calculation-row"><span style="font-size: 18px;">State/Province Tax:</span> <span id="subRegionTax" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
-      <div id="businessSummary" style="display: none; margin-top: 24px; padding-top: 24px; border-top: 2px solid rgba(255, 255, 255, 0.3);">
-       <div class="calculation-row"><span style="font-size: 18px;">Gross Revenue:</span> <span id="grossRevenue" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
-       <div class="calculation-row"><span style="font-size: 18px;">Cost of Goods Sold:</span> <span id="cogsTotal" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
-       <div class="calculation-row"><span style="font-size: 18px;">Total Business Expenses:</span> <span id="totalBusinessExpenses" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
-       <div class="calculation-row"><span style="font-size: 18px; font-weight: 700;">Net Business Income:</span> <span id="netBusinessIncome" style="font-size: 18px; font-weight: 700;">$0.00</span></div>
+     <div class="card">
+      <div class="section-title">
+       Income Sources
       </div>
-      <div style="margin-top: 24px; padding: 16px; background: rgba(255, 255, 255, 0.2); border-radius: 8px; font-size: 14px; line-height: 1.6;">
-       💡 <strong>Tax Optimization Tips:</strong><br><span id="taxTips"></span>
+      <div class="input-group">
+       <div class="form-group"><label for="personalWages">W-2 Wages</label> <input type="number" id="personalWages" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="personalSalary">Salary / Self-Employment</label> <input type="number" id="personalSalary" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="personalInterest">Interest Income</label> <input type="number" id="personalInterest" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="personalDividends">Dividends</label> <input type="number" id="personalDividends" placeholder="0.00" min="0">
+       </div>
       </div>
-      <button id="saveBtn" style="width: 100%; margin-top: 24px; background: white; color: #667eea; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 600; border: none; cursor: pointer;">
-        Save This Calculation
-      </button>
-     </div><!-- Saved Calculations -->
-     <div id="savedCalculations" style="margin-top: 32px;"></div>
-    </div><!-- Disclaimer -->
-    <div style="margin-top: 40px; padding: 20px; background: white; border-radius: 12px; border-left: 4px solid #f59e0b;">
-     <p style="font-size: 14px; color: #64748b; line-height: 1.6; margin: 0;"><strong style="color: #0f172a;">⚠️ Important Disclaimer:</strong> This calculator provides estimates for educational purposes only and is not a substitute for professional tax advice. Verify calculations with official tax tables or a tax professional.</p>
+     </div>
+     <div class="card">
+      <div class="section-title">
+       Deductions
+      </div>
+      <div class="checkbox-group"><input type="checkbox" id="useStandardDeduction" checked> <label for="useStandardDeduction" class="checkbox-label">Use Standard Deduction</label>
+      </div>
+      <div class="form-group" id="itemizedSection" style="display: none;">
+       <div class="input-group">
+        <div class="form-group"><label for="mortgageInterest">Mortgage Interest</label> <input type="number" id="mortgageInterest" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="propertyTax">Property Tax</label> <input type="number" id="propertyTax" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="studentLoan">Student Loan Interest</label> <input type="number" id="studentLoan" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="charityContributions">Charity Contributions</label> <input type="number" id="charityContributions" placeholder="0.00" min="0">
+        </div>
+       </div>
+      </div>
+     </div><!-- US OPTIMIZATION -->
+     <div class="card" id="usOptimization">
+      <div class="section-title">
+       💎 Advanced Tax Optimization (US)
+      </div>
+      <div class="optimization-tabs"><button class="opt-tab active" data-tab="us-retirement">Retirement</button> <button class="opt-tab" data-tab="us-capital">Capital Gains</button> <button class="opt-tab" data-tab="us-credits">Tax Credits</button> <button class="opt-tab" data-tab="us-strategies">Pro Strategies</button>
+      </div>
+      <div id="us-retirement-tab" class="opt-content active">
+       <div class="input-group">
+        <div class="form-group"><label for="traditionalIRA">Traditional IRA ($7,000 limit)</label> <input type="number" id="traditionalIRA" placeholder="0.00" min="0" max="7000">
+        </div>
+        <div class="form-group"><label for="roth401k">Roth 401(k) ($23,500 limit)</label> <input type="number" id="roth401k" placeholder="0.00" min="0" max="23500">
+        </div>
+        <div class="form-group"><label for="sepIRA">SEP-IRA (Self-Employed)</label> <input type="number" id="sepIRA" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="hsa">HSA ($4,150 individual limit)</label> <input type="number" id="hsa" placeholder="0.00" min="0" max="4150">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 Triple tax advantage: Pre-tax contribution, tax-free growth, tax-free withdrawal for medical expenses
+       </div>
+      </div>
+      <div id="us-capital-tab" class="opt-content">
+       <div class="input-group">
+        <div class="form-group"><label for="longTermCapitalGains">Long-Term Capital Gains (0%, 15%, 20%)</label> <input type="number" id="longTermCapitalGains" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="shortTermCapitalGains">Short-Term Capital Gains (Ordinary)</label> <input type="number" id="shortTermCapitalGains" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="capitalLosses">Capital Losses (Harvesting)</label> <input type="number" id="capitalLosses" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="qualifiedDividends">Qualified Dividends (Preferential)</label> <input type="number" id="qualifiedDividends" placeholder="0.00" min="0">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 Tax-loss harvesting: Offset gains with losses. Unused losses carry forward indefinitely
+       </div>
+      </div>
+      <div id="us-credits-tab" class="opt-content">
+       <div class="input-group">
+        <div class="form-group"><label for="childTaxCredit">Child Tax Credit ($2,000/child)</label> <input type="number" id="childTaxCredit" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="earnedIncomeCredit">Earned Income Credit (EITC)</label> <input type="number" id="earnedIncomeCredit" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="educationCredit">Education Credit (AOTC)</label> <input type="number" id="educationCredit" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="energyCredit">Residential Clean Energy (30%)</label> <input type="number" id="energyCredit" placeholder="0.00" min="0">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 AOTC: Up to $2,500 per student. IRA early withdrawal penalty waiver for qualified education costs
+       </div>
+      </div>
+      <div id="us-strategies-tab" class="opt-content">
+       <div class="input-group">
+        <div class="form-group"><label for="businessLosses">Net Operating Loss (NOL) Carryforward</label> <input type="number" id="businessLosses" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="homeOfficeDeduction">Home Office Deduction</label> <input type="number" id="homeOfficeDeduction" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="dependentCare">Dependent Care FSA ($5,000)</label> <input type="number" id="dependentCare" placeholder="0.00" min="0" max="5000">
+        </div>
+        <div class="form-group"><label for="studentLoanRepayment">Student Loan Interest ($2,500)</label> <input type="number" id="studentLoanRepayment" placeholder="0.00" min="0" max="2500">
+        </div>
+       </div>
+       <div class="input-group" style="margin-top: 16px;">
+        <div class="form-group"><label for="alternativeMinimumTax">AMT (Alternative Minimum Tax)</label> <input type="number" id="alternativeMinimumTax" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="qbi">Qualified Business Income (QBI) - 20%</label> <input type="number" id="qbi" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="bunching">Income Bunching (Deferred)</label> <input type="number" id="bunching" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="estimated">Estimated Tax Payments (Q1-Q4)</label> <input type="number" id="estimated" placeholder="0.00" min="0">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 QBI: Self-employed &amp; small business owners get 20% deduction on qualified business income
+       </div>
+      </div>
+     </div><!-- CANADIAN OPTIMIZATION -->
+     <div class="card" id="caOptimization" style="display: none;">
+      <div class="section-title">
+       💎 Advanced Tax Optimization (Canada)
+      </div>
+      <div class="optimization-tabs"><button class="opt-tab active" data-tab="ca-retirement">RRSP/RESP</button> <button class="opt-tab" data-tab="ca-capital">Investment Income</button> <button class="opt-tab" data-tab="ca-credits">Tax Credits</button> <button class="opt-tab" data-tab="ca-strategies">Pro Strategies</button>
+      </div>
+      <div id="ca-retirement-tab" class="opt-content active">
+       <div class="input-group">
+        <div class="form-group"><label for="rrspContribution">RRSP Contribution (Tax Deduction)</label> <input type="number" id="rrspContribution" placeholder="18% prior year income" min="0">
+        </div>
+        <div class="form-group"><label for="firstTimeHomeBuyer">Home Buyers' Plan ($35,000)</label> <input type="number" id="firstTimeHomeBuyer" placeholder="0.00" min="0" max="35000">
+        </div>
+        <div class="form-group"><label for="respContribution">RESP Contribution (Grant eligible)</label> <input type="number" id="respContribution" placeholder="0.00" min="0" max="2500">
+        </div>
+        <div class="form-group"><label for="tfsa">TFSA Contribution ($6,500 limit)</label> <input type="number" id="tfsa" placeholder="0.00" min="0" max="6500">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 CESG: Government matches 20% of RESP contributions. Free money for education!
+       </div>
+      </div>
+      <div id="ca-capital-tab" class="opt-content">
+       <div class="input-group">
+        <div class="form-group"><label for="capitalGainsInclusion">Capital Gains (50% inclusion)</label> <input type="number" id="capitalGainsInclusion" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="dividendIncome">Dividend Income (Grossed-up)</label> <input type="number" id="dividendIncome" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="capitalLossesCA">Capital Losses (Carry back/fwd)</label> <input type="number" id="capitalLossesCA" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="foreignInvestmentIncome">Foreign Investment Income</label> <input type="number" id="foreignInvestmentIncome" placeholder="0.00" min="0">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 TFSA: Tax-free growth &amp; withdrawals. RRSP: Tax-deferred. Use both strategically
+       </div>
+      </div>
+      <div id="ca-credits-tab" class="opt-content">
+       <div class="input-group">
+        <div class="form-group"><label for="canadaChildBenefit">Canada Child Benefit (Monthly)</label> <input type="number" id="canadaChildBenefit" placeholder="$6,833-$16,997/year" min="0">
+        </div>
+        <div class="form-group"><label for="gstHstCredit">GST/HST Credit (Quarterly)</label> <input type="number" id="gstHstCredit" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="basicPersonalAmount">Basic Personal Amount (Credit)</label> <input type="number" id="basicPersonalAmount" placeholder="$15,705 non-refundable" min="0">
+        </div>
+        <div class="form-group"><label for="tuitionCredit">Tuition &amp; Education Credit</label> <input type="number" id="tuitionCredit" placeholder="0.00" min="0">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 CCB paid monthly (not taxable). Spouse can transfer tuition credits. Maximize benefits
+       </div>
+      </div>
+      <div id="ca-strategies-tab" class="opt-content">
+       <div class="input-group">
+        <div class="form-group"><label for="splitIncome">Spousal RRSP (Income Splitting)</label> <input type="number" id="splitIncome" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="cpptakeup">CPP/OAS Deferral (Age 60-70)</label> <input type="number" id="cpptakeup" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="businessExpenses">Business Deductions &amp; Expenses</label> <input type="number" id="businessExpenses" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="medicalExpenses">Medical Expense Credit (15%)</label> <input type="number" id="medicalExpenses" placeholder="0.00" min="0">
+        </div>
+       </div>
+       <div class="input-group" style="margin-top: 16px;">
+        <div class="form-group"><label for="carryForwardLosses">Loss Carryforwards (3yr back/∞fwd)</label> <input type="number" id="carryForwardLosses" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="commonLawSpouse">Common-Law Spouse Benefits</label> <input type="number" id="commonLawSpouse" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="prinicipalResidenceExemption">Principal Residence Exemption</label> <input type="number" id="prinicipalResidenceExemption" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group"><label for="canadaWorkerBenefit">Canada Worker Benefit</label> <input type="number" id="canadaWorkerBenefit" placeholder="0.00" min="0">
+        </div>
+       </div>
+       <div class="pro-tip">
+        💡 Principal Residence Exemption: Tax-free capital gains on principal home. Strategic property designation
+       </div>
+      </div>
+     </div>
+    </div>
+    <div id="businessFormSection" class="hidden">
+     <div class="card">
+      <div class="section-title">
+       Business Type
+      </div>
+      <div class="form-group"><select id="businessType"> <option value="sole">Sole Proprietorship</option> <option value="llc">LLC</option> <option value="partnership">Partnership</option> <option value="c_corp">C-Corporation</option> <option value="s_corp">S-Corporation</option> </select>
+      </div>
+     </div>
+     <div class="card">
+      <div class="section-title">
+       Revenue
+      </div>
+      <div class="input-group">
+       <div class="form-group"><label for="businessGrossReceipts">Gross Receipts</label> <input type="number" id="businessGrossReceipts" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="businessReturns">Returns / Allowances</label> <input type="number" id="businessReturns" placeholder="0.00" min="0">
+       </div>
+      </div>
+     </div>
+     <div class="card">
+      <div class="section-title">
+       Business Expenses
+      </div>
+      <div class="input-group">
+       <div class="form-group"><label for="businessSalaries">Salaries &amp; Wages</label> <input type="number" id="businessSalaries" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="businessRent">Rent</label> <input type="number" id="businessRent" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="businessUtilities">Utilities</label> <input type="number" id="businessUtilities" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="businessSupplies">Supplies</label> <input type="number" id="businessSupplies" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="businessDepreciation">Depreciation</label> <input type="number" id="businessDepreciation" placeholder="0.00" min="0">
+       </div>
+       <div class="form-group"><label for="businessOtherExpenses">Other Expenses</label> <input type="number" id="businessOtherExpenses" placeholder="0.00" min="0">
+       </div>
+      </div>
+     </div>
+    </div><button id="calculateBtn" class="calc-btn">Calculate Tax Estimate</button>
+    <div id="resultsSection" class="hidden">
+     <div class="results-section">
+      <h2>📊 Tax Calculation Summary</h2>
+      <div class="result-row">
+       <div class="result-label">
+        Total Income
+       </div>
+       <div class="result-value" id="resultTotalIncome">
+        $0.00
+       </div>
+      </div>
+      <div class="result-row">
+       <div class="result-label">
+        Total Deductions
+       </div>
+       <div class="result-value" id="resultTotalDeductions">
+        $0.00
+       </div>
+      </div>
+      <div class="result-row">
+       <div class="result-label">
+        Taxable Income
+       </div>
+       <div class="result-value" id="resultTaxableIncome">
+        $0.00
+       </div>
+      </div>
+      <div class="result-row">
+       <div class="result-label">
+        Federal/National Tax
+       </div>
+       <div class="result-value" id="resultFederalTax">
+        $0.00
+       </div>
+      </div>
+      <div class="result-row">
+       <div class="result-label">
+        State/Province Tax
+       </div>
+       <div class="result-value" id="resultStateTax">
+        $0.00
+       </div>
+      </div>
+      <div class="result-row">
+       <div class="result-label">
+        <strong>Total Estimated Tax</strong>
+       </div>
+       <div class="result-value" id="resultTotalTax" style="font-size: 1.4em;">
+        $0.00
+       </div>
+      </div>
+      <div class="result-row">
+       <div class="result-label">
+        Effective Tax Rate
+       </div>
+       <div class="result-value" id="resultEffectiveRate">
+        0.0%
+       </div>
+      </div>
+     </div>
+     <div class="disclaimer" id="disclaimerText">
+      ⚠️ For estimation purposes only. Not professional tax advice. Please consult a tax professional.
+     </div>
     </div>
    </div>
   </div>
-
   <script>
-    const defaultConfig = {
-      app_title: 'Professional Tax Estimator',
-      tagline: 'US & Canada Tax Calculator',
-      background_color: '#f8fafc',
-      surface_color: '#ffffff',
-      text_color: '#0f172a',
-      primary_color: '#667eea',
-      secondary_color: '#64748b'
+    const usFederalBrackets = {
+      single: [
+        { limit: 11600, rate: 0.10 },
+        { limit: 47150, rate: 0.12 },
+        { limit: 100525, rate: 0.22 },
+        { limit: 191950, rate: 0.24 },
+        { limit: 243725, rate: 0.32 },
+        { limit: 609350, rate: 0.35 },
+        { limit: Infinity, rate: 0.37 }
+      ],
+      married_joint: [
+        { limit: 23200, rate: 0.10 },
+        { limit: 94300, rate: 0.12 },
+        { limit: 201050, rate: 0.22 },
+        { limit: 383900, rate: 0.24 },
+        { limit: 487450, rate: 0.32 },
+        { limit: 731200, rate: 0.35 },
+        { limit: Infinity, rate: 0.37 }
+      ]
     };
 
-    let savedCalculationsData = [];
-
-    const dataHandler = {
-      onDataChanged(data) {
-        savedCalculationsData = data;
-        renderSavedCalculations();
-      }
-    };
-
-    // Sample state/province tax rates (flat rates used for demonstration).
-    // Replace with accurate progressive rates if needed.
     const usStateRates = {
-      'AL': 0.05, 'AK': 0.00, 'AZ': 0.045, 'AR': 0.045, 'CA': 0.09, 'CO': 0.0463,
-      'CT': 0.05, 'DE': 0.00, 'FL': 0.00, 'GA': 0.0575, 'HI': 0.07, 'ID': 0.06,
-      'IL': 0.0495, 'IN': 0.0323, 'IA': 0.06, 'KS': 0.05, 'KY': 0.05, 'LA': 0.02,
-      'ME': 0.055, 'MD': 0.05, 'MA': 0.05, 'MI': 0.0425, 'MN': 0.06875, 'MS': 0.05,
-      'MO': 0.054, 'MT': 0.00, 'NE': 0.054, 'NV': 0.00, 'NH': 0.00, 'NJ': 0.0637,
-      'NM': 0.049, 'NY': 0.06, 'NC': 0.0525, 'ND': 0.018, 'OH': 0.028, 'OK': 0.05,
-      'OR': 0.0, 'PA': 0.0307, 'RI': 0.0375, 'SC': 0.07, 'SD': 0.0, 'TN': 0.0,
-      'TX': 0.0, 'UT': 0.0495, 'VT': 0.0577, 'VA': 0.0575, 'WA': 0.0, 'WV': 0.06,
-      'WI': 0.05, 'WY': 0.0, 'default': 0.05
+      'AL': 0.05, 'AK': 0.00, 'AZ': 0.055, 'AR': 0.055, 'CA': 0.093, 'CO': 0.044, 'CT': 0.065, 'DE': 0.066,
+      'FL': 0.00, 'GA': 0.055, 'HI': 0.088, 'ID': 0.058, 'IL': 0.0495, 'IN': 0.034, 'IA': 0.06, 'KS': 0.057,
+      'KY': 0.05, 'LA': 0.06, 'ME': 0.075, 'MD': 0.0575, 'MA': 0.05, 'MI': 0.044, 'MN': 0.0985, 'MS': 0.05,
+      'MO': 0.054, 'MT': 0.069, 'NE': 0.064, 'NV': 0.00, 'NH': 0.00, 'NJ': 0.0637, 'NM': 0.05, 'NY': 0.0685,
+      'NC': 0.048, 'ND': 0.027, 'OH': 0.037, 'OK': 0.05, 'OR': 0.0995, 'PA': 0.0307, 'RI': 0.063, 'SC': 0.07,
+      'SD': 0.00, 'TN': 0.00, 'TX': 0.00, 'UT': 0.049, 'VT': 0.075, 'VA': 0.059, 'WA': 0.00, 'WV': 0.065,
+      'WI': 0.061, 'WY': 0.00, 'DC': 0.085
     };
 
     const caProvRates = {
-      'ON': 0.0505, 'QC': 0.15, 'BC': 0.0506, 'AB': 0.10, 'MB': 0.108, 'NB': 0.0968,
-      'NL': 0.087, 'NS': 0.0879, 'PE': 0.098, 'SK': 0.11, 'NT': 0.05, 'YT': 0.064,
-      'NU': 0.04, 'default': 0.05
+      'AB': 0.10, 'BC': 0.0505, 'MB': 0.08, 'NB': 0.09, 'NL': 0.08, 'NS': 0.0879,
+      'ON': 0.0505, 'PE': 0.09, 'QC': 0.15, 'SK': 0.10
     };
+
+    const defaultConfig = {
+      main_title: 'Professional Tax Estimator',
+      subtitle: 'US & Canada Tax Calculator',
+      disclaimer: '⚠️ For estimation purposes only. Not professional tax advice. Please consult a tax professional.'
+    };
+
+    let currentConfig = { ...defaultConfig };
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => {
+        currentConfig = config;
+        document.getElementById('mainTitle').textContent = config.main_title || defaultConfig.main_title;
+        document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+        document.getElementById('disclaimerText').textContent = config.disclaimer || defaultConfig.disclaimer;
+      },
+      mapToCapabilities: () => ({
+        recolorables: [],
+        borderables: [],
+        fontEditable: undefined,
+        fontSizeable: undefined
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['main_title', config.main_title || defaultConfig.main_title],
+        ['subtitle', config.subtitle || defaultConfig.subtitle],
+        ['disclaimer', config.disclaimer || defaultConfig.disclaimer]
+      ])
+    });
 
     function populateSubRegions(country) {
       const select = document.getElementById('subRegion');
       select.innerHTML = '<option value="">Select state / province</option>';
 
+      const regions = country === 'us' 
+        ? Object.keys(usStateRates).sort()
+        : Object.keys(caProvRates).sort();
+
+      regions.forEach(region => {
+        const option = document.createElement('option');
+        option.value = region;
+        option.textContent = region;
+        select.appendChild(option);
+      });
+
       if (country === 'us') {
-        Object.keys(usStateRates).forEach(k => {
-          if (k === 'default') return;
-          const opt = document.createElement('option');
-          opt.value = k;
-          opt.textContent = k;
-          select.appendChild(opt);
-        });
-      } else if (country === 'ca' || country === 'canada') {
-        Object.keys(caProvRates).forEach(k => {
-          if (k === 'default') return;
-          const opt = document.createElement('option');
-          opt.value = k;
-          opt.textContent = k;
-          select.appendChild(opt);
-        });
-      }
-    }
-
-    function getSubRegionRate(country, code) {
-      if (!code) return 0;
-      if (country === 'us') return usStateRates[code] ?? usStateRates['default'];
-      if (country === 'ca' || country === 'canada') return caProvRates[code] ?? caProvRates['default'];
-      return 0;
-    }
-
-    async function initializeApp() {
-      if (window.dataSdk) {
-        const initResult = await window.dataSdk.init(dataHandler);
-        if (!initResult.isOk) {
-          console.error('Failed to initialize data SDK');
-        }
-      }
-
-      if (window.elementSdk) {
-        window.elementSdk.init({
-          defaultConfig,
-          onConfigChange: async (config) => {
-            document.getElementById('mainTitle').textContent = config.app_title || defaultConfig.app_title;
-            document.getElementById('tagline').textContent = config.tagline || defaultConfig.tagline;
-            
-            const customFont = config.font_family || defaultConfig.font_family || 'Inter';
-            const baseFontStack = '-apple-system, BlinkMacSystemFont, sans-serif';
-            document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
-            
-            const baseSize = config.font_size || 16;
-            document.getElementById('mainTitle').style.fontSize = `${baseSize * 3}px`;
-            document.getElementById('tagline').style.fontSize = `${baseSize * 1.25}px`;
-            
-            document.getElementById('app').style.background = `linear-gradient(to bottom right, ${config.background_color || defaultConfig.background_color}, ${config.secondary_color || defaultConfig.secondary_color})`;
-            
-            const sections = document.querySelectorAll('.section-card');
-            sections.forEach(section => {
-              section.style.background = config.surface_color || defaultConfig.surface_color;
-            });
-            
-            document.querySelectorAll('h1, h2, h3, label, p').forEach(el => {
-              if (!el.closest('.summary-card')) {
-                el.style.color = config.text_color || defaultConfig.text_color;
-              }
-            });
-            
-            document.getElementById('calculateBtn').style.background = `linear-gradient(135deg, ${config.primary_color || defaultConfig.primary_color} 0%, #764ba2 100%)`;
-            
-            const activeTab = document.querySelector('.tab-button.active');
-            if (activeTab) {
-              activeTab.style.background = config.primary_color || defaultConfig.primary_color;
-              activeTab.style.borderColor = config.primary_color || defaultConfig.primary_color;
-            }
-          },
-          mapToCapabilities: (config) => ({
-            recolorables: [
-              {
-                get: () => config.background_color || defaultConfig.background_color,
-                set: (value) => {
-                  if (window.elementSdk) {
-                    window.elementSdk.setConfig({ background_color: value });
-                  }
-                }
-              },
-              {
-                get: () => config.surface_color || defaultConfig.surface_color,
-                set: (value) => {
-                  if (window.elementSdk) {
-                    window.elementSdk.setConfig({ surface_color: value });
-                  }
-                }
-              },
-              {
-                get: () => config.text_color || defaultConfig.text_color,
-                set: (value) => {
-                  if (window.elementSdk) {
-                    window.elementSdk.setConfig({ text_color: value });
-                  }
-                }
-              },
-              {
-                get: () => config.primary_color || defaultConfig.primary_color,
-                set: (value) => {
-                  if (window.elementSdk) {
-                    window.elementSdk.setConfig({ primary_color: value });
-                  }
-                }
-              },
-              {
-                get: () => config.secondary_color || defaultConfig.secondary_color,
-                set: (value) => {
-                  if (window.elementSdk) {
-                    window.elementSdk.setConfig({ secondary_color: value });
-                  }
-                }
-              }
-            ],
-            borderables: [],
-            fontEditable: {
-              get: () => config.font_family || defaultConfig.font_family || 'Inter',
-              set: (value) => {
-                if (window.elementSdk) {
-                  window.elementSdk.setConfig({ font_family: value });
-                }
-              }
-            },
-            fontSizeable: {
-              get: () => config.font_size || 16,
-              set: (value) => {
-                if (window.elementSdk) {
-                  window.elementSdk.setConfig({ font_size: value });
-                }
-              }
-            }
-          }),
-          mapToEditPanelValues: (config) => new Map([
-            ['app_title', config.app_title || defaultConfig.app_title],
-            ['tagline', config.tagline || defaultConfig.tagline]
-          ])
-        });
-      }
-
-      // populate subregions initially based on default country selection
-      const countryEl = document.getElementById('country');
-      if (countryEl) {
-        populateSubRegions(countryEl.value);
-        countryEl.addEventListener('change', (e) => {
-          populateSubRegions(e.target.value);
-        });
-      }
-    }
-
-    // Tab switching
-    document.getElementById('personalBtn').addEventListener('click', () => {
-      document.getElementById('personalBtn').classList.add('active');
-      document.getElementById('businessBtn').classList.remove('active');
-      document.getElementById('personalForm').style.display = 'block';
-      document.getElementById('businessForm').style.display = 'none';
-      
-      const config = window.elementSdk?.config || defaultConfig;
-      document.getElementById('personalBtn').style.background = config.primary_color || defaultConfig.primary_color;
-      document.getElementById('personalBtn').style.borderColor = config.primary_color || defaultConfig.primary_color;
-      document.getElementById('personalBtn').style.color = 'white';
-      document.getElementById('businessBtn').style.background = 'white';
-      document.getElementById('businessBtn').style.borderColor = '#cbd5e1';
-      document.getElementById('businessBtn').style.color = '#64748b';
-    });
-
-    document.getElementById('businessBtn').addEventListener('click', () => {
-      document.getElementById('businessBtn').classList.add('active');
-      document.getElementById('personalBtn').classList.remove('active');
-      document.getElementById('businessForm').style.display = 'block';
-      document.getElementById('personalForm').style.display = 'none';
-      
-      const config = window.elementSdk?.config || defaultConfig;
-      document.getElementById('businessBtn').style.background = config.primary_color || defaultConfig.primary_color;
-      document.getElementById('businessBtn').style.borderColor = config.primary_color || defaultConfig.primary_color;
-      document.getElementById('businessBtn').style.color = 'white';
-      document.getElementById('personalBtn').style.background = 'white';
-      document.getElementById('personalBtn').style.borderColor = '#cbd5e1';
-      document.getElementById('personalBtn').style.color = '#64748b';
-    });
-
-    // Standard deduction toggle
-    document.getElementById('standardDeduction').addEventListener('change', (e) => {
-      document.getElementById('itemizedSection').style.display = e.target.checked ? 'none' : 'block';
-    });
-
-    // Calculate button
-    document.getElementById('calculateBtn').addEventListener('click', async () => {
-      const btn = document.getElementById('calculateBtn');
-      btn.disabled = true;
-      btn.innerHTML = 'Calculating... <span class="loader"></span>';
-      
-      const country = document.getElementById('country').value;
-      const isPersonal = document.getElementById('personalForm').style.display === 'block';
-      
-      if (isPersonal) {
-        await calculatePersonalTax(country);
+        document.getElementById('usOptimization').style.display = 'block';
+        document.getElementById('caOptimization').style.display = 'none';
       } else {
-        await calculateBusinessTax(country);
+        document.getElementById('usOptimization').style.display = 'none';
+        document.getElementById('caOptimization').style.display = 'block';
       }
-      
-      btn.disabled = false;
-      btn.textContent = 'Calculate Tax Estimate';
-      document.getElementById('results').style.display = 'block';
-      document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-    });
+    }
 
-    async function calculatePersonalTax(country) {
-      const wages = parseFloat(document.getElementById('wages').value) || 0;
-      const interest = parseFloat(document.getElementById('interest').value) || 0;
-      const dividends = parseFloat(document.getElementById('dividends').value) || 0;
-      const capitalGains = parseFloat(document.getElementById('capitalGains').value) || 0;
-      const selfEmployment = parseFloat(document.getElementById('selfEmployment').value) || 0;
-      const rentalIncome = parseFloat(document.getElementById('rentalIncome').value) || 0;
-      const retirement = parseFloat(document.getElementById('retirement').value) || 0;
-      const socialSecurity = parseFloat(document.getElementById('socialSecurity').value) || 0;
-      const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
-      
-      const totalIncome = wages + interest + dividends + capitalGains + selfEmployment + 
-                          rentalIncome + retirement + socialSecurity + otherIncome;
-      
-      const filingStatus = document.getElementById('filingStatus').value;
-      const useStandard = document.getElementById('standardDeduction').checked;
-      const dependents = parseInt(document.getElementById('dependents').value) || 0;
-      
-      let deductions = 0;
-      
-      if (useStandard) {
-        if (country === 'us') {
-          switch(filingStatus) {
-            case 'single': deductions = 14600; break;
-            case 'married_joint': deductions = 29200; break;
-            case 'married_separate': deductions = 14600; break;
-            case 'head': deductions = 21900; break;
-            default: deductions = 14600;
-          }
-        } else {
-          deductions = 15000;
-        }
-      } else {
-        const mortgage = parseFloat(document.getElementById('mortgageInterest').value) || 0;
-        const propertyTax = parseFloat(document.getElementById('propertyTax').value) || 0;
-        const charitable = parseFloat(document.getElementById('charitableDonations').value) || 0;
-        const medical = parseFloat(document.getElementById('medicalExpenses').value) || 0;
-        
-        deductions = mortgage + Math.min(propertyTax, 10000) + charitable + Math.max(medical - (totalIncome * 0.075), 0);
-      }
-      
-      deductions += parseFloat(document.getElementById('retirementContrib').value) || 0;
-      deductions += parseFloat(document.getElementById('hsaContrib').value) || 0;
-      deductions += parseFloat(document.getElementById('studentLoanInterest').value) || 0;
-      
-      const childcareExpenses = parseFloat(document.getElementById('childcareExpenses').value) || 0;
-      const educationExpenses = parseFloat(document.getElementById('educationExpenses').value) || 0;
-      
-      const selfEmploymentTax = selfEmployment * 0.153;
-      deductions += selfEmploymentTax / 2;
-      
-      const taxableIncome = Math.max(totalIncome - deductions, 0);
-      
+    function calculateProgressiveTax(income, filingStatus) {
+      const brackets = usFederalBrackets[filingStatus] || usFederalBrackets.single;
       let tax = 0;
-      if (country === 'us') {
-        if (filingStatus === 'single') {
-          if (taxableIncome <= 11600) tax = taxableIncome * 0.10;
-          else if (taxableIncome <= 47150) tax = 1160 + (taxableIncome - 11600) * 0.12;
-          else if (taxableIncome <= 100525) tax = 5426 + (taxableIncome - 47150) * 0.22;
-          else if (taxableIncome <= 191950) tax = 17168.50 + (taxableIncome - 100525) * 0.24;
-          else if (taxableIncome <= 243725) tax = 39110.50 + (taxableIncome - 191950) * 0.32;
-          else if (taxableIncome <= 609350) tax = 55678.50 + (taxableIncome - 243725) * 0.35;
-          else tax = 183647.25 + (taxableIncome - 609350) * 0.37;
-        } else if (filingStatus === 'married_joint') {
-          if (taxableIncome <= 23200) tax = taxableIncome * 0.10;
-          else if (taxableIncome <= 94300) tax = 2320 + (taxableIncome - 23200) * 0.12;
-          else if (taxableIncome <= 201050) tax = 10852 + (taxableIncome - 94300) * 0.22;
-          else if (taxableIncome <= 383900) tax = 34337 + (taxableIncome - 201050) * 0.24;
-          else if (taxableIncome <= 487450) tax = 78221 + (taxableIncome - 383900) * 0.32;
-          else if (taxableIncome <= 731200) tax = 111357 + (taxableIncome - 487450) * 0.35;
-          else tax = 196669.50 + (taxableIncome - 731200) * 0.37;
-        } else {
-          if (taxableIncome <= 11600) tax = taxableIncome * 0.10;
-          else if (taxableIncome <= 47150) tax = 1160 + (taxableIncome - 11600) * 0.12;
-          else tax = 5426 + (taxableIncome - 47150) * 0.22;
-        }
-        
-        tax += selfEmploymentTax;
-        
-        const childTaxCredit = Math.min(dependents * 2000, tax);
-        tax -= childTaxCredit;
-        
-        const childcareCredit = Math.min(childcareExpenses * 0.35, dependents > 1 ? 2100 : 1050);
-        tax -= childcareCredit;
-        
-        const educationCredit = Math.min(educationExpenses, 2500);
-        tax -= educationCredit;
-      } else {
-        const federalTax = calculateCanadianFederalTax(taxableIncome);
-        const provincialTax = federalTax * 0.5;
-        tax = federalTax + provincialTax;
-        
-        const childcareDeduction = Math.min(childcareExpenses, dependents * 8000);
-        const educationCredit = educationExpenses * 0.15;
-        tax -= educationCredit;
-      }
-      
-      // compute state/province tax on the taxable income
-      const subRegionCode = document.getElementById('subRegion')?.value || '';
-      const subRegionRate = getSubRegionRate(country, subRegionCode);
-      const subRegionTax = Math.max(taxableIncome * subRegionRate, 0);
-      tax += subRegionTax;
+      let previousLimit = 0;
 
-      tax = Math.max(tax, 0);
-      
-      document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('totalDeductions').textContent = '$' + deductions.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('taxableIncome').textContent = '$' + taxableIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('estimatedTax').textContent = '$' + tax.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('effectiveRate').textContent = totalIncome > 0 ? ((tax / totalIncome) * 100).toFixed(1) + '%' : '0.0%';
-      
-      document.getElementById('businessSummary').style.display = 'none';
-
-      const subTaxEl = document.getElementById('subRegionTax');
-      if (subTaxEl) subTaxEl.textContent = '$' + subRegionTax.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      
-      generateTaxTips(country, totalIncome, deductions, tax, true);
-    }
-
-    function calculateCanadianFederalTax(income) {
-      let tax = 0;
-      if (income <= 55867) {
-        tax = income * 0.15;
-      } else if (income <= 111733) {
-        tax = 8380.05 + (income - 55867) * 0.205;
-      } else if (income <= 173205) {
-        tax = 19829.89 + (income - 111733) * 0.26;
-      } else if (income <= 246752) {
-        tax = 35812.61 + (income - 173205) * 0.29;
-      } else {
-        tax = 57144.98 + (income - 246752) * 0.33;
+      for (const bracket of brackets) {
+        if (income <= previousLimit) break;
+        const taxableInThisBracket = Math.min(income, bracket.limit) - previousLimit;
+        tax += taxableInThisBracket * bracket.rate;
+        previousLimit = bracket.limit;
       }
       return tax;
     }
 
-    async function calculateBusinessTax(country) {
-      const grossReceipts = parseFloat(document.getElementById('grossReceipts').value) || 0;
-      const returnsAllowances = parseFloat(document.getElementById('returnsAllowances').value) || 0;
-      const otherBusinessIncome = parseFloat(document.getElementById('otherBusinessIncome').value) || 0;
-      
-      const beginningInventory = parseFloat(document.getElementById('beginningInventory').value) || 0;
-      const purchases = parseFloat(document.getElementById('purchases').value) || 0;
-      const laborCosts = parseFloat(document.getElementById('laborCosts').value) || 0;
-      const endingInventory = parseFloat(document.getElementById('endingInventory').value) || 0;
-      
-      const cogs = beginningInventory + purchases + laborCosts - endingInventory;
-      
-      const advertising = parseFloat(document.getElementById('advertising').value) || 0;
-      const vehicleExpenses = parseFloat(document.getElementById('vehicleExpenses').value) || 0;
-      const officeExpenses = parseFloat(document.getElementById('officeExpenses').value) || 0;
-      const rentLease = parseFloat(document.getElementById('rentLease').value) || 0;
-      const utilities = parseFloat(document.getElementById('utilities').value) || 0;
-      const insurance = parseFloat(document.getElementById('insurance').value) || 0;
-      const professionalFees = parseFloat(document.getElementById('professionalFees').value) || 0;
-      const wages = parseFloat(document.getElementById('wages').value) || 0;
-      const repairs = parseFloat(document.getElementById('repairs').value) || 0;
-      const travel = parseFloat(document.getElementById('travel').value) || 0;
-      const depreciation = parseFloat(document.getElementById('depreciation').value) || 0;
-      const businessInterest = parseFloat(document.getElementById('businessInterest').value) || 0;
-      const otherExpenses = parseFloat(document.getElementById('otherExpenses').value) || 0;
-      const homeOffice = parseFloat(document.getElementById('homeOffice').value) || 0;
-      
-      const totalExpenses = advertising + vehicleExpenses + officeExpenses + rentLease + utilities + 
-                           insurance + professionalFees + wages + repairs + travel + depreciation + 
-                           businessInterest + otherExpenses + homeOffice;
-      
-      const grossRevenue = grossReceipts - returnsAllowances + otherBusinessIncome;
-      const grossProfit = grossRevenue - cogs;
-      const netBusinessIncome = grossProfit - totalExpenses;
-      
-      const businessType = document.getElementById('businessType').value;
-      let taxRate = 0.21;
-      
-      if (country === 'us') {
-        if (businessType === 'c_corp') {
-          taxRate = 0.21;
-        } else {
-          taxRate = 0.24;
-        }
-      } else {
-        if (businessType === 'c_corp') {
-          taxRate = 0.15;
-        } else {
-          taxRate = 0.20;
-        }
-      }
-      
-      // compute sub-region tax for business (applied to net business income)
-      const subRegionCode = document.getElementById('subRegion')?.value || '';
-      const subRegionRate = getSubRegionRate(country, subRegionCode);
-      const subRegionTax = Math.max(netBusinessIncome, 0) * subRegionRate;
+    async function calculatePersonalTax() {
+      const wages = parseFloat(document.getElementById('personalWages').value) || 0;
+      const salary = parseFloat(document.getElementById('personalSalary').value) || 0;
+      const interest = parseFloat(document.getElementById('personalInterest').value) || 0;
+      const dividends = parseFloat(document.getElementById('personalDividends').value) || 0;
 
-      const estimatedTax = Math.max(netBusinessIncome * taxRate, 0) + Math.max(subRegionTax, 0);
-      
-      document.getElementById('totalIncome').textContent = '$' + grossRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('totalDeductions').textContent = '$' + (cogs + totalExpenses).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('taxableIncome').textContent = '$' + Math.max(netBusinessIncome, 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('estimatedTax').textContent = '$' + estimatedTax.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('effectiveRate').textContent = grossRevenue > 0 ? ((estimatedTax / grossRevenue) * 100).toFixed(1) + '%' : '0.0%';
-      
-      document.getElementById('businessSummary').style.display = 'block';
-      document.getElementById('grossRevenue').textContent = '$' + grossRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('cogsTotal').textContent = '$' + cogs.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('totalBusinessExpenses').textContent = '$' + totalExpenses.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      document.getElementById('netBusinessIncome').textContent = '$' + netBusinessIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      
-      const subTaxEl = document.getElementById('subRegionTax');
-      if (subTaxEl) subTaxEl.textContent = '$' + subRegionTax.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      
-      generateTaxTips(country, grossRevenue, totalExpenses, estimatedTax, false);
-    }
-
-    function generateTaxTips(country, income, deductions, tax, isPersonal) {
-      const tips = [];
-      
-      if (isPersonal) {
-        if (country === 'us') {
-          tips.push('Maximize retirement contributions (401k/IRA) to reduce taxable income');
-          tips.push('Consider HSA contributions for triple tax benefits');
-          tips.push('Track charitable donations and keep receipts');
-          tips.push('Review if itemizing deductions would save more than standard deduction');
-        } else {
-          tips.push('Maximize RRSP contributions - 18% of income up to $31,560');
-          tips.push('Utilize TFSA for tax-free investment growth');
-          tips.push('Claim all eligible medical expenses over 3% of income');
-          tips.push('Take advantage of federal and provincial education credits');
-        }
-      } else {
-        tips.push('Keep detailed records of all expenses - documentation is critical');
-        tips.push('Consider Section 179 or bonus depreciation for equipment purchases');
-        tips.push('Track vehicle mileage daily for maximum deduction');
-        tips.push('Home office deduction can provide significant savings if qualified');
-        tips.push('Hire family members to shift income to lower tax brackets');
-        tips.push('Consider retirement plans like SEP-IRA or Solo 401k for self-employed');
-      }
-      
-      document.getElementById('taxTips').innerHTML = tips.join('<br>• ');
-    }
-
-    document.getElementById('saveBtn').addEventListener('click', async () => {
-      if (!window.dataSdk) return;
-      
-      if (savedCalculationsData.length >= 999) {
-        const tipsEl = document.getElementById('taxTips');
-        tipsEl.innerHTML = '<strong style="color: #fef3c7;">⚠️ Maximum limit of 999 saved calculations reached. Please delete some before saving new ones.</strong>';
-        return;
-      }
-      
-      const btn = document.getElementById('saveBtn');
-      btn.disabled = true;
-      btn.innerHTML = 'Saving... <span class="loader"></span>';
-      
+      const totalIncome = wages + salary + interest + dividends;
+      const filingStatus = document.getElementById('personalFilingStatus').value;
+      const useStandard = document.getElementById('useStandardDeduction').checked;
       const country = document.getElementById('country').value;
-      const isPersonal = document.getElementById('personalForm').style.display === 'block';
-      
-      const subRegionValue = document.getElementById('subRegion')?.value || '';
-      const subRegionTaxValue = parseFloat(document.getElementById('subRegionTax')?.textContent.replace(/[$,]/g, '')) || 0;
 
-      const calculation = {
-        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-        timestamp: new Date().toISOString(),
-        country: country === 'us' ? 'United States' : 'Canada',
-        tax_type: isPersonal ? 'Personal' : 'Business',
-        filing_status: isPersonal ? document.getElementById('filingStatus').value : document.getElementById('businessType').value,
-        sub_region: subRegionValue,
-        total_income: parseFloat(document.getElementById('totalIncome').textContent.replace(/[$,]/g, '')) || 0,
-        total_deductions: parseFloat(document.getElementById('totalDeductions').textContent.replace(/[$,]/g, '')) || 0,
-        taxable_income: parseFloat(document.getElementById('taxableIncome').textContent.replace(/[$,]/g, '')) || 0,
-        estimated_tax: parseFloat(document.getElementById('estimatedTax').textContent.replace(/[$,]/g, '')) || 0,
-        state_tax: subRegionTaxValue,
-        effective_rate: parseFloat(document.getElementById('effectiveRate').textContent.replace('%', '')) || 0
+      const standardDeductions = {
+        us: { single: 14600, married_joint: 29200, married_separate: 14600, head: 21900 },
+        ca: 15000
       };
-      
-      const result = await window.dataSdk.create(calculation);
-      
-      if (result.isOk) {
-        btn.textContent = '✓ Saved Successfully!';
-        setTimeout(() => {
-          btn.textContent = 'Save This Calculation';
-          btn.disabled = false;
-        }, 2000);
+
+      let deductions = useStandard
+        ? (country === 'us' ? (standardDeductions.us[filingStatus] || 14600) : standardDeductions.ca)
+        : ((parseFloat(document.getElementById('mortgageInterest').value) || 0) +
+           (parseFloat(document.getElementById('propertyTax').value) || 0) +
+           (parseFloat(document.getElementById('studentLoan').value) || 0) +
+           (parseFloat(document.getElementById('charityContributions').value) || 0));
+
+      // US OPTIMIZATION
+      if (country === 'us') {
+        const traditionalIRA = parseFloat(document.getElementById('traditionalIRA').value) || 0;
+        const sepIRA = parseFloat(document.getElementById('sepIRA').value) || 0;
+        const hsa = parseFloat(document.getElementById('hsa').value) || 0;
+        const dependentCare = parseFloat(document.getElementById('dependentCare').value) || 0;
+        const studentLoanDed = parseFloat(document.getElementById('studentLoanRepayment').value) || 0;
+        const homeOffice = parseFloat(document.getElementById('homeOfficeDeduction').value) || 0;
+        const nol = parseFloat(document.getElementById('businessLosses').value) || 0;
+
+        const longTermCapGains = parseFloat(document.getElementById('longTermCapitalGains').value) || 0;
+        const shortTermCapGains = parseFloat(document.getElementById('shortTermCapitalGains').value) || 0;
+        const capitalLosses = parseFloat(document.getElementById('capitalLosses').value) || 0;
+        const qualifiedDiv = parseFloat(document.getElementById('qualifiedDividends').value) || 0;
+
+        const childCredit = parseFloat(document.getElementById('childTaxCredit').value) || 0;
+        const eicCredit = parseFloat(document.getElementById('earnedIncomeCredit').value) || 0;
+        const eduCredit = parseFloat(document.getElementById('educationCredit').value) || 0;
+        const energyCredit = parseFloat(document.getElementById('energyCredit').value) || 0;
+
+        const qbi = parseFloat(document.getElementById('qbi').value) || 0;
+        const bunching = parseFloat(document.getElementById('bunching').value) || 0;
+        const estimatedPaid = parseFloat(document.getElementById('estimated').value) || 0;
+
+        const preTaxDeductions = traditionalIRA + sepIRA + hsa + dependentCare + studentLoanDed + homeOffice + nol;
+        const netCapitalGains = Math.max(longTermCapGains + shortTermCapGains - capitalLosses, 0);
+        const totalOptimizedIncome = totalIncome + netCapitalGains - preTaxDeductions;
+        const adjustedGrossIncome = Math.max(totalOptimizedIncome - bunching, 0);
+        const totalDeductionsAdjusted = deductions + preTaxDeductions;
+        const taxableIncome = Math.max(adjustedGrossIncome - totalDeductionsAdjusted, 0);
+
+        const qbiDeduction = Math.min(qbi * 0.20, taxableIncome * 0.20);
+        let federalTax = calculateProgressiveTax(taxableIncome - qbiDeduction, filingStatus);
+        const ltCapGainsTax = longTermCapGains * 0.15;
+        federalTax = federalTax + ltCapGainsTax;
+
+        const subRegion = document.getElementById('subRegion').value;
+        let stateTax = 0;
+        if (subRegion) {
+          const rate = usStateRates[subRegion] || 0.05;
+          stateTax = (taxableIncome - nol) * rate;
+        }
+
+        const totalCredits = childCredit + eicCredit + eduCredit + energyCredit;
+        const totalTaxBefore = federalTax + stateTax;
+        let totalTax = Math.max(totalTaxBefore - totalCredits - estimatedPaid, 0);
+
+        const effectiveRate = totalOptimizedIncome > 0 ? (totalTax / totalOptimizedIncome) * 100 : 0;
+        const baselineTax = calculateProgressiveTax(totalIncome - deductions, filingStatus) + stateTax;
+        const taxSavings = Math.max(baselineTax - totalTax, 0);
+
+        document.getElementById('resultTotalIncome').textContent = `$${totalOptimizedIncome.toFixed(2)}`;
+        document.getElementById('resultTotalDeductions').textContent = `$${totalDeductionsAdjusted.toFixed(2)}`;
+        document.getElementById('resultTaxableIncome').textContent = `$${taxableIncome.toFixed(2)}`;
+        document.getElementById('resultFederalTax').textContent = `$${federalTax.toFixed(2)}`;
+        document.getElementById('resultStateTax').textContent = `$${stateTax.toFixed(2)}`;
+        document.getElementById('resultTotalTax').textContent = `$${totalTax.toFixed(2)}`;
+        document.getElementById('resultEffectiveRate').textContent = `${effectiveRate.toFixed(2)}%`;
+
+        const resultsSection = document.getElementById('resultsSection');
+        resultsSection.innerHTML = `
+          <div class="results-section">
+            <h2>📊 Advanced Tax Calculation (US)</h2>
+            <div class="result-row">
+              <div class="result-label">Total Income</div>
+              <div class="result-value">\$${totalOptimizedIncome.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Pre-Tax Deductions</div>
+              <div class="result-value">\$${preTaxDeductions.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Standard/Itemized Deductions</div>
+              <div class="result-value">\$${deductions.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Taxable Income</div>
+              <div class="result-value">\$${taxableIncome.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Federal Tax</div>
+              <div class="result-value">\$${federalTax.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">State Tax</div>
+              <div class="result-value">\$${stateTax.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Tax Credits</div>
+              <div class="result-value" style="color: #22c55e;">-\$${totalCredits.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label"><strong>Total Tax</strong></div>
+              <div class="result-value" style="font-size: 1.4em;">\$${totalTax.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Effective Rate</div>
+              <div class="result-value">${effectiveRate.toFixed(2)}%</div>
+            </div>
+          </div>
+          ${taxSavings > 0 ? `<div class="tax-savings-indicator"><div class="savings-label">💰 Tax Savings</div><div class="savings-amount">\$${taxSavings.toFixed(2)}</div></div>` : ''}
+          <div class="disclaimer">⚠️ For estimation purposes only. Consult a tax professional.</div>
+          <div class="pro-tip">💡 Strategies used: Traditional IRA deduction, HSA triple-tax advantage, Capital gains tax optimization, QBI 20% deduction, Tax credits, Income bunching</div>
+        `;
+
       } else {
-        btn.textContent = 'Error Saving';
-        setTimeout(() => {
-          btn.textContent = 'Save This Calculation';
-          btn.disabled = false;
-        }, 2000);
+        // CANADIAN OPTIMIZATION
+        const rrspContribution = parseFloat(document.getElementById('rrspContribution').value) || 0;
+        const homeByersPlan = parseFloat(document.getElementById('firstTimeHomeBuyer').value) || 0;
+        const respContribution = parseFloat(document.getElementById('respContribution').value) || 0;
+        const tfsa = parseFloat(document.getElementById('tfsa').value) || 0;
+
+        const capitalGains = parseFloat(document.getElementById('capitalGainsInclusion').value) || 0;
+        const dividendIncome = parseFloat(document.getElementById('dividendIncome').value) || 0;
+        const capitalLossesCA = parseFloat(document.getElementById('capitalLossesCA').value) || 0;
+        const foreignIncome = parseFloat(document.getElementById('foreignInvestmentIncome').value) || 0;
+
+        const ccb = parseFloat(document.getElementById('canadaChildBenefit').value) || 0;
+        const gstCredit = parseFloat(document.getElementById('gstHstCredit').value) || 0;
+        const basicPersonal = parseFloat(document.getElementById('basicPersonalAmount').value) || 0;
+        const tuitionCredit = parseFloat(document.getElementById('tuitionCredit').value) || 0;
+
+        const spousalRRSP = parseFloat(document.getElementById('splitIncome').value) || 0;
+        const cpppas = parseFloat(document.getElementById('cpptakeup').value) || 0;
+        const businessExp = parseFloat(document.getElementById('businessExpenses').value) || 0;
+        const medicalExp = parseFloat(document.getElementById('medicalExpenses').value) || 0;
+        const carryForward = parseFloat(document.getElementById('carryForwardLosses').value) || 0;
+        const prinResidence = parseFloat(document.getElementById('prinicipalResidenceExemption').value) || 0;
+
+        const preaxDeductionsCA = rrspContribution + homeByersPlan + spousalRRSP + businessExp;
+        const netCapitalGainsCA = Math.max(capitalGains - capitalLossesCA, 0);
+        const totalOptimizedIncomeCA = totalIncome + (netCapitalGainsCA * 0.50) + dividendIncome + foreignIncome - preaxDeductionsCA - carryForward;
+        const totalDeductionsCA = deductions + preaxDeductionsCA;
+        const taxableIncomeCA = Math.max(totalOptimizedIncomeCA - totalDeductionsCA, 0);
+
+        let federalTaxCA = taxableIncomeCA * 0.15;
+        const subRegion = document.getElementById('subRegion').value;
+        let provincialTax = 0;
+        if (subRegion) {
+          const rate = caProvRates[subRegion] || 0.08;
+          provincialTax = taxableIncomeCA * rate;
+        }
+
+        const totalCreditsCA = ccb + gstCredit + basicPersonal + tuitionCredit;
+        let totalTaxCA = Math.max((federalTaxCA + provincialTax) - totalCreditsCA, 0);
+
+        const effectiveRateCA = totalOptimizedIncomeCA > 0 ? (totalTaxCA / totalOptimizedIncomeCA) * 100 : 0;
+
+        document.getElementById('resultTotalIncome').textContent = `$${totalOptimizedIncomeCA.toFixed(2)}`;
+        document.getElementById('resultTotalDeductions').textContent = `$${totalDeductionsCA.toFixed(2)}`;
+        document.getElementById('resultTaxableIncome').textContent = `$${taxableIncomeCA.toFixed(2)}`;
+        document.getElementById('resultFederalTax').textContent = `$${federalTaxCA.toFixed(2)}`;
+        document.getElementById('resultStateTax').textContent = `$${provincialTax.toFixed(2)}`;
+        document.getElementById('resultTotalTax').textContent = `$${totalTaxCA.toFixed(2)}`;
+        document.getElementById('resultEffectiveRate').textContent = `${effectiveRateCA.toFixed(2)}%`;
+
+        const resultsSection = document.getElementById('resultsSection');
+        resultsSection.innerHTML = `
+          <div class="results-section">
+            <h2>📊 Advanced Tax Calculation (Canada)</h2>
+            <div class="result-row">
+              <div class="result-label">Total Income</div>
+              <div class="result-value">\$${totalOptimizedIncomeCA.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">RRSP/Retirement Deductions</div>
+              <div class="result-value">\$${preaxDeductionsCA.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Standard Deductions</div>
+              <div class="result-value">\$${deductions.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Taxable Income</div>
+              <div class="result-value">\$${taxableIncomeCA.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Federal Tax</div>
+              <div class="result-value">\$${federalTaxCA.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Provincial Tax</div>
+              <div class="result-value">\$${provincialTax.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Tax Credits & Benefits</div>
+              <div class="result-value" style="color: #22c55e;">-\$${totalCreditsCA.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label"><strong>Total Tax</strong></div>
+              <div class="result-value" style="font-size: 1.4em;">\$${totalTaxCA.toFixed(2)}</div>
+            </div>
+            <div class="result-row">
+              <div class="result-label">Effective Rate</div>
+              <div class="result-value">${effectiveRateCA.toFixed(2)}%</div>
+            </div>
+          </div>
+          <div class="disclaimer">⚠️ For estimation purposes only. Consult a tax professional.</div>
+          <div class="pro-tip">💡 Strategies used: RRSP deduction, Home Buyers' Plan, CESG matching, Spousal RRSP splitting, Capital gains inclusion (50%), TFSA tax-free growth</div>
+        `;
+      }
+
+      document.getElementById('resultsSection').classList.remove('hidden');
+      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function calculateBusinessTax() {
+      const gross = parseFloat(document.getElementById('businessGrossReceipts').value) || 0;
+      const returns = parseFloat(document.getElementById('businessReturns').value) || 0;
+      const salaries = parseFloat(document.getElementById('businessSalaries').value) || 0;
+      const rent = parseFloat(document.getElementById('businessRent').value) || 0;
+      const utilities = parseFloat(document.getElementById('businessUtilities').value) || 0;
+      const supplies = parseFloat(document.getElementById('businessSupplies').value) || 0;
+      const depreciation = parseFloat(document.getElementById('businessDepreciation').value) || 0;
+      const other = parseFloat(document.getElementById('businessOtherExpenses').value) || 0;
+
+      const netRevenue = gross - returns;
+      const totalExpenses = salaries + rent + utilities + supplies + depreciation + other;
+      const netIncome = Math.max(netRevenue - totalExpenses, 0);
+
+      const businessType = document.getElementById('businessType').value;
+      const country = document.getElementById('country').value;
+      const taxRate = country === 'us' ? (businessType === 'c_corp' ? 0.21 : 0.20) : 0.26;
+
+      const federalTax = netIncome * taxRate;
+
+      const subRegion = document.getElementById('subRegion').value;
+      let stateTax = 0;
+      if (subRegion) {
+        const rate = country === 'us'
+          ? (usStateRates[subRegion] || 0.05) * 0.5
+          : (caProvRates[subRegion] || 0.05) * 0.5;
+        stateTax = netIncome * rate;
+      }
+
+      const totalTax = federalTax + stateTax;
+      const effectiveRate = netRevenue > 0 ? (totalTax / netRevenue) * 100 : 0;
+
+      document.getElementById('resultTotalIncome').textContent = `$${netRevenue.toFixed(2)}`;
+      document.getElementById('resultTotalDeductions').textContent = `$${totalExpenses.toFixed(2)}`;
+      document.getElementById('resultTaxableIncome').textContent = `$${netIncome.toFixed(2)}`;
+      document.getElementById('resultFederalTax').textContent = `$${federalTax.toFixed(2)}`;
+      document.getElementById('resultStateTax').textContent = `$${stateTax.toFixed(2)}`;
+      document.getElementById('resultTotalTax').textContent = `$${totalTax.toFixed(2)}`;
+      document.getElementById('resultEffectiveRate').textContent = `${effectiveRate.toFixed(2)}%`;
+
+      document.getElementById('resultsSection').classList.remove('hidden');
+      document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.getElementById('country').addEventListener('change', (e) => {
+      populateSubRegions(e.target.value);
+    });
+
+    document.getElementById('personalBtn').addEventListener('click', () => {
+      document.getElementById('personalFormSection').classList.remove('hidden');
+      document.getElementById('businessFormSection').classList.add('hidden');
+      document.getElementById('personalBtn').classList.add('active');
+      document.getElementById('businessBtn').classList.remove('active');
+    });
+
+    document.getElementById('businessBtn').addEventListener('click', () => {
+      document.getElementById('personalFormSection').classList.add('hidden');
+      document.getElementById('businessFormSection').classList.remove('hidden');
+      document.getElementById('personalBtn').classList.remove('active');
+      document.getElementById('businessBtn').classList.add('active');
+    });
+
+    document.getElementById('useStandardDeduction').addEventListener('change', (e) => {
+      document.getElementById('itemizedSection').style.display = e.target.checked ? 'none' : 'block';
+    });
+
+    document.querySelectorAll('.opt-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        const currentCard = tab.closest('.card');
+        
+        currentCard.querySelectorAll('.opt-tab').forEach(t => t.classList.remove('active'));
+        currentCard.querySelectorAll('.opt-content').forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        currentCard.querySelector(`#${tabName}-tab`).classList.add('active');
+      });
+    });
+
+    document.getElementById('calculateBtn').addEventListener('click', () => {
+      const isPersonal = !document.getElementById('personalFormSection').classList.contains('hidden');
+      if (isPersonal) {
+        calculatePersonalTax();
+      } else {
+        calculateBusinessTax();
       }
     });
 
-    function renderSavedCalculations() {
-      if (!savedCalculationsData || savedCalculationsData.length === 0) {
-        const container = document.getElementById('savedCalculations');
-        container.innerHTML = '';
-        return;
-      }
-      
-      const container = document.getElementById('savedCalculations');
-      container.innerHTML = '<h3 style="font-size: 24px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Saved Calculations</h3>';
-      
-      savedCalculationsData.slice().reverse().forEach(calc => {
-        const card = document.createElement('div');
-        card.className = 'section-card';
-        card.style.marginBottom = '16px';
-        
-        const date = new Date(calc.timestamp);
-        const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-        
-        const totalIncome = calc.total_income || 0;
-        const totalDeductions = calc.total_deductions || 0;
-        const estimatedTax = calc.estimated_tax || 0;
-        const effectiveRate = typeof calc.effective_rate === 'number' ? calc.effective_rate.toFixed(1) : (calc.effective_rate || '0.0');
-        const stateTax = calc.state_tax || 0;
-        
-        card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: start;">
-            <div style="flex: 1;">
-              <div style="font-weight: 600; font-size: 18px; color: #0f172a; margin-bottom: 8px;">
-                ${calc.country} - ${calc.tax_type} Tax
-              </div>
-              <div style="font-size: 14px; color: #64748b; margin-bottom: 12px;">
-                ${formattedDate}
-              </div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px;">
-                <div><strong>Income:</strong> $${(totalIncome).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
-                <div><strong>Deductions:</strong> $${(totalDeductions).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
-                <div><strong>Tax:</strong> $${(estimatedTax).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
-                <div><strong>Rate:</strong> ${effectiveRate}%</div>
-                <div><strong>Sub-region:</strong> ${calc.sub_region || '—'}</div>
-                <div><strong>State/Prov Tax:</strong> $${(stateTax).toFixed(2).replace(/\B(?=((\d{3}))+(!\d))/g, ",")}</div>
-              </div>
-            </div>
-            <button class="delete-btn" data-id="${calc.__backendId || calc.id}" style="background: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px;">
-              Delete
-            </button>
-          </div>
-        `;
-        
-        container.appendChild(card);
-      });
-      
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-          const id = e.target.getAttribute('data-id');
-          const calculation = savedCalculationsData.find(c => (c.__backendId === id) || (c.id === id));
-          if (!calculation) return;
-          
-          btn.disabled = true;
-          btn.textContent = 'Deleting...';
-          
-          if (!window.dataSdk) {
-            btn.textContent = 'Error';
-            setTimeout(() => {
-              btn.textContent = 'Delete';
-              btn.disabled = false;
-            }, 2000);
-            return;
-          }
-          
-          const result = await window.dataSdk.delete(calculation);
-          
-          if (result.isOk) {
-            // Rely on dataSdk to push updated list via onDataChanged.
-            btn.textContent = 'Deleted';
-            setTimeout(() => {
-              // No-op: saved list will re-render when SDK notifies; keep button disabled to avoid confusion.
-            }, 800);
-          } else {
-            btn.textContent = 'Error';
-            setTimeout(() => {
-              btn.textContent = 'Delete';
-              btn.disabled = false;
-            }, 2000);
-          }
-        });
-      });
-    }
-
-    // Initialize the app (populate subregions, connect SDKs)
-    initializeApp();
+    populateSubRegions('us');
   </script>
- </body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9cb8821257c6a2bc',t:'MTc3MDY5NDAxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
