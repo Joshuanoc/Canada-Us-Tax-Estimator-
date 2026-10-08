@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "headers": [{
+    "source": "/api/(.*)",
+    "headers": [{"key": "Cache-Control", "value": "no-store"}]
+  }]
+}

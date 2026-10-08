@@ -45,3 +45,29 @@ test('saved calculations survive reload and can be deleted',async({page})=>{
  await expect(page.locator('.saved-item')).toHaveCount(1);await page.reload();await expect(page.locator('.saved-item')).toHaveCount(1);
  await page.locator('[data-del]').click();await expect(page.locator('.saved-item')).toHaveCount(0);
 });
+
+test('backend deployment uses the calculation API without a login',async({page})=>{
+ await expect(page.locator('#cloudStatus')).toContainText('Calculations run on the server');
+ await page.locator('#wages').fill('100000');const response=page.waitForResponse(r=>r.url().includes('/api/calculate')&&r.request().method()==='POST');
+ await page.locator('#calculateBtn').click();expect((await response).status()).toBe(200);expect(await amount(page,'estimatedTax')).toBe(13170);
+ await expect(page.getByRole('button',{name:/sign in|log in/i})).toHaveCount(0);
+});
+
+test('guest cloud UI saves, loads and deletes scenarios without rendering a name as HTML',async({page})=>{
+ let rows=[];
+ await page.route('**/api/health',route=>route.fulfill({json:{status:'ok',storageConfigured:true}}));
+ await page.route('**/api/scenarios*',async route=>{
+  const req=route.request();if(req.method()==='POST'){
+   const data=req.postDataJSON();const result=await page.evaluate(()=>({...lastResult}));
+   rows=[{id:'test-id',name:'<img src=x onerror=alert(1)>',input:data.input,result,created_at:new Date().toISOString()}];
+   return route.fulfill({status:201,json:{scenario:rows[0]}});
+  }
+  if(req.method()==='DELETE'){rows=[];return route.fulfill({json:{deleted:true}});}
+  return route.fulfill({json:{scenarios:rows}});
+ });
+ await page.reload();await expect(page.locator('#cloudStatus')).toContainText('no login is needed');
+ await page.locator('#wages').fill('100000');await page.locator('#calculateBtn').click();await expect(page.locator('#estimatedTax')).toContainText('13,170');await page.locator('#saveBtn').click();
+ await expect(page.locator('.saved-item')).toHaveCount(1);await expect(page.locator('.saved-item img')).toHaveCount(0);
+ await page.locator('#wages').fill('1');await page.getByRole('button',{name:'Load',exact:true}).click();await expect(page.locator('#wages')).toHaveValue('100000');
+ await page.locator('[data-del]').click();await expect(page.locator('.saved-item')).toHaveCount(0);
+});

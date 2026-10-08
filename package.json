@@ -4,10 +4,15 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "test": "playwright test",
-    "build": "node scripts/build.mjs"
+    "test": "npm run test:backend && playwright test",
+    "build": "node scripts/build.mjs",
+    "test:backend": "node --test tests/backend/*.test.js"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@playwright/test": "1.64.0"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }
