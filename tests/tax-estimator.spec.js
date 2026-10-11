@@ -43,7 +43,7 @@ test('negative income and unsupported dividend income are rejected',async({page}
 test('corporate net income uses the federal corporate rate and rejects impossible returns',async({page})=>{
  await page.locator('#businessBtn').click();await page.locator('#businessType').selectOption('c_corp');
  await page.locator('#grossReceipts').fill('100000');await page.locator('#advertising').fill('10000');await submit(page);
- expect(await amount(page,'taxableIncome')).toBe(90000);expect(await amount(page,'estimatedTax')).toBe(18900);
+ expect(await amount(page,'taxableIncome')).toBe(90000);expect(await amount(page,'estimatedTax')).toBe(18900);expect(await amount(page,'afterTax')).toBe(71100);expect(await amount(page,'monthlyTakeHome')).toBe(5925);await expect(page.locator('#afterTaxLabel')).toContainText('after-tax profit');await expect(page.locator('#afterTaxBasis')).toContainText('not cash flow');
  await page.locator('#returnsAllowances').fill('100001');await submit(page);await expect(page.locator('#errorBox')).toContainText('cannot exceed gross receipts');
 });
 test('saved calculations survive reload and can be deleted',async({page})=>{
