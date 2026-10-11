@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';import http from 'node:http';
 import{createHandler}from '../../backend/http.js';import{calculate}from '../../backend/tax.js';
 const A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222',ID='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-async function server(t,options={}){const s=http.createServer(createHandler(options));await new Promise(r=>s.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>s.close(r)));return `http://127.0.0.1:${s.address().port}`;}
+async function server(t,options={}){const s=http.createServer(createHandler({rateLimit:async()=>{},...options}));await new Promise(r=>s.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>s.close(r)));return `http://127.0.0.1:${s.address().port}`;}
 const env={SUPABASE_URL:'https://example.supabase.co',SUPABASE_PUBLISHABLE_KEY:'test-public-key',NODE_ENV:'production'};
 function provider(){const rows=[];const calls=[];return{calls,rows,fetchImpl:async(url,opts)=>{
  calls.push({url,opts});const path=new URL(url);const token=opts.headers.Authorization?.replace('Bearer ','');const owner=token==='access-b'?B:A;
@@ -50,4 +50,12 @@ test('malformed JSON shapes, oversized payloads and session cookies are rejected
  assert.equal((await fetch(url+'/api/scenarios',{headers:{Cookie:'taxmetric_access=%ZZ'}})).status,400);
  assert.equal((await post(url+'/api/calculate',{}, {Origin:'null'})).status,403);
  assert.equal((await post(url+'/api/calculate',{}, {'Sec-Fetch-Site':'cross-site'})).status,403);
+});
+
+test('health leaves free browser mode available when production protection is unconfigured',async t=>{
+ const url=await server(t,{env});const health=await (await fetch(url+'/api/health')).json();
+ assert.equal(health.calculationApiAvailable,false);assert.equal(health.storageConfigured,false);
+ const local=await server(t,{env:{}});assert.equal((await (await fetch(local+'/api/health')).json()).calculationApiAvailable,true);
+ const configured=await server(t,{env:{...env,UPSTASH_REDIS_REST_URL:'https://test.upstash.io',UPSTASH_REDIS_REST_TOKEN:'test-token',RATE_LIMIT_SECRET:'a'.repeat(32)}});
+ assert.equal((await (await fetch(configured+'/api/health')).json()).calculationApiAvailable,true);
 });

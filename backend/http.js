@@ -1,7 +1,8 @@
+import {createRateLimiter} from './rateLimit.js';
 import {calculate,normalizeInput} from './tax.js';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 class HttpError extends Error{constructor(status,message){super(message);this.status=status;}}
-export function createHandler({fetchImpl=fetch,env=process.env}={}){
+export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createRateLimiter({env})}={}){
  const config=()=>{
   if(!env.SUPABASE_URL||!env.SUPABASE_PUBLISHABLE_KEY)throw new HttpError(503,'Cloud saving is not configured.');
   const url=new URL(env.SUPABASE_URL);
@@ -48,15 +49,25 @@ export function createHandler({fetchImpl=fetch,env=process.env}={}){
     if(req.headers['sec-fetch-site']==='cross-site')throw new HttpError(403,'Cross-site requests are not permitted.');
    }
    const url=new URL(req.url,'http://localhost'),path=url.pathname;
-   if(path==='/api/health'&&req.method==='GET')return send(200,{status:'ok',storageConfigured:Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v1'});
+   if(path==='/api/health'&&req.method==='GET'){
+    const production=env.NODE_ENV==='production'||env.VERCEL==='1';
+    let protectionConfigured=false;
+    try{const endpoint=new URL(env.UPSTASH_REDIS_REST_URL);protectionConfigured=endpoint.protocol==='https:'&&!endpoint.username&&!endpoint.password&&Boolean(env.UPSTASH_REDIS_REST_TOKEN)&&typeof env.RATE_LIMIT_SECRET==='string'&&env.RATE_LIMIT_SECRET.length>=32;}catch{}
+    const calculationApiAvailable=!production||protectionConfigured;
+    return send(200,{status:'ok',calculationApiAvailable,storageConfigured:calculationApiAvailable&&Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v1'});
+   }
    if(path==='/api/calculate'&&req.method==='POST'){
+    await rateLimit(req,'calculate',60,60);
     const input=await body(req);let result;try{result=calculate(input);}catch(e){throw new HttpError(400,e.message);}return send(200,{result});
    }
    if(path==='/api/scenarios'){
+    await rateLimit(req,'scenarios',60,60);
+    if(req.method==='POST')await rateLimit(req,'save-ip',20,3600);
     if(req.method==='POST'){
      const raw=await body(req);if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new HttpError(400,'Scenario must be a JSON object.');let input,result;try{input=normalizeInput(raw.input);result=calculate(input);}catch(e){throw new HttpError(400,e.message);}
      if(raw.name!==undefined&&(typeof raw.name!=='string'||raw.name.length>100))throw new HttpError(400,'Scenario name must be at most 100 characters.');
      const session=await guest(req,res,true);
+     await rateLimit(req,'save-owner',100,86400,session.user.id);
      const data=await provider('/rest/v1/scenarios',{method:'POST',token:session.token,body:{owner_id:session.user.id,name:raw.name||'Saved scenario',input,result}});return send(201,{scenario:data?.[0]});
     }
     if(req.method==='GET'){
@@ -70,7 +81,8 @@ export function createHandler({fetchImpl=fetch,env=process.env}={}){
     }
    }
    return send(405,{error:'Method or endpoint not supported.'});
-  }catch(e){return send(e.status||502,{error:e.status?e.message:'Backend service unavailable.'});}
+  }catch(e){if(e.retryAfter)res.setHeader('Retry-After',String(e.retryAfter));return send(e.status||502,{error:e.status?e.message:'Backend service unavailable.'});}
  };
 }
 export default createHandler();
+

@@ -79,7 +79,26 @@ test('guest cloud UI saves, loads and deletes scenarios without rendering a name
 
 test('local saved scenario text cannot create executable markup',async({page})=>{
  await page.evaluate(()=>localStorage.setItem('taxmetric_saved',JSON.stringify([{country:'us',subRegion:'<img src=x onerror="window.savedInjected=true">',mode:'personal',timestamp:Date.now(),estimated:1,after:1}])));
- await page.reload();
+ await page.reload();await expect(page.locator('.saved-item')).toHaveCount(1);
  await expect(page.locator('#savedCalculations img')).toHaveCount(0);
  expect(await page.evaluate(()=>window.savedInjected)).toBeUndefined();
+});
+test('browser-saved hostile invalid mode is discarded',async({page})=>{
+ await page.evaluate(()=>localStorage.setItem('taxmetric_saved',JSON.stringify([{country:'us',subRegion:'<img src=x onerror=alert(1)>',mode:'<svg onload=alert(1)>',timestamp:new Date().toISOString(),estimated:1,after:2}])));
+ await page.reload();await expect(page.locator('.saved-item')).toHaveCount(0);
+ await expect(page.locator('#savedCalculations img, #savedCalculations svg')).toHaveCount(0);
+});
+test('CSP rejects inline scripts while calculations work',async({page})=>{
+ await page.evaluate(()=>{const script=document.createElement('script');script.textContent='window.untrustedScriptRan=true';document.body.append(script)});
+ expect(await page.evaluate(()=>window.untrustedScriptRan)).toBeUndefined();
+ await page.locator('#wages').fill('100000');await submit(page);await expect(page.locator('#estimatedTax')).toContainText('13,170');
+});
+
+test('free standard mode works when protected calculation API is unavailable',async({page})=>{
+ let calls=0;
+ await page.route('**/api/health',route=>route.fulfill({json:{status:'ok',calculationApiAvailable:false,storageConfigured:false}}));
+ await page.route('**/api/calculate',route=>{calls++;return route.fulfill({status:503,json:{error:'Protected API unavailable'}})});
+ await page.reload();await expect(page.locator('#cloudStatus')).toContainText('Free standard mode');
+ await page.evaluate(()=>taxEngineReady);await page.locator('#wages').fill('100000');await submit(page);
+ await expect(page.locator('#estimatedTax')).toContainText('13,170');expect(calls).toBe(0);
 });

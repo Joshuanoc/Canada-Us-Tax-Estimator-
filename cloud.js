@@ -30,8 +30,8 @@
    item.append(content,load,del);box.append(item);
   }
  }
- try{const health=await request('/api/health');apiAvailable=health.status==='ok';storageAvailable=health.storageConfigured===true;}catch{}
- if(!apiAvailable){notice.textContent='This preview saves scenarios only in this browser. Cloud saving is available on the backend deployment.';return;}
+ try{const health=await request('/api/health');apiAvailable=health.status==='ok'&&health.calculationApiAvailable!==false;storageAvailable=health.storageConfigured===true;}catch{}
+ if(!apiAvailable){notice.textContent='Free standard mode calculates and saves in this browser. The protected calculation service is unavailable; no account or cloud service is required.';return;}
  $('calculateBtn').onclick=()=>pending($('calculateBtn'),calculateOnServer);
  $('saveScenarioBtn').onclick=()=>pending($('saveScenarioBtn'),async()=>{scenarioA=await calculateOnServer();$('saveScenarioBtn').textContent='✓ Scenario A saved';});
  if(!storageAvailable){notice.textContent='Cloud saving is not connected yet. Calculations run on the server; saves remain in this browser.';return;}

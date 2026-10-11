@@ -5,20 +5,20 @@
 Reviewed tracked application, API, storage SQL, dependency lockfile and release configuration. This is a source review with mocked provider tests and local PostgreSQL (PGlite), not a certification of deployed infrastructure or historical secret exposure.
 
 - `npm ci`: passed.
-- Updated backend suite: 12 tests passed after API and schema fixes.
+- Merged backend suite: 22 tests passed after API/schema fixes, shared limiter restoration, configuration-health fallback and package dependency checks.
 - `npx playwright test --list`: 18 desktop/mobile cases collected successfully; collection is not execution.
 - `npm audit --audit-level=high`: all dependencies included; zero reported vulnerabilities on review date.
 - Backend API tests: validate numeric inputs, recompute saved results, isolate guest owners, refresh sessions, reject cross-site mutations, reject malformed JSON/session cookies and oversized bodies.
 - Local PostgreSQL tests: RLS ownership and anonymous denial; rerunning schema now removes legacy excessive authenticated privileges.
-- Bounded tracked-file security scan added; private env files, generated private directories, private-key and selected credential patterns fail CI. Git history and all possible credential formats are outside its coverage.
+- Bounded tracked-file security scan added; private env files, generated private directories, private-key and selected credential patterns fail CI. This bounded scan does not cover all credential formats. The reusable security workflow now also scans complete Git history with Gitleaks; that CI scan has not yet been executed for the merged commit.
 
 ## Confirmed fixes
 
 1. Scenario POST with JSON `null` or arrays previously returned misleading service failures; now explicit HTTP 400. Malformed cookie encoding and request origins have explicit client errors.
 2. Storage SQL previously granted SELECT/INSERT/DELETE without revoking existing authenticated privileges. It now revokes both anon/authenticated before granting required operations. Local regression test seeds UPDATE/TRUNCATE/REFERENCES/TRIGGER then confirms their removal. This file has not been applied to a live database.
 3. Local saved-scenario HTML interpolation was identified and reported to UI owner; E2E injection regression added. Confirm final UI fix before release.
-4. Existing GitHub workflow deployed automatically on main and exposed Vercel token to an entire deployment job. Replaced it with validation-only CI using read-only permissions, credential-free checkout, SHA-pinned actions, unit/integration/browser tests, build, dependency audit and tracked-file security checks.
-5. Vercel repository configuration disables automatic Git deployment (`git.deploymentEnabled: false`), documented at https://vercel.com/docs/project-configuration/git-configuration. Source change does not prove live project enforcement. Header configuration adds MIME sniffing, framing, referrer and browser capability protections.
+4. Existing GitHub workflow deployed automatically on main and exposed Vercel token to an entire deployment job. Replaced it with validation-only CI using read-only permissions, credential-free checkout, updated SHA-pinned actions, unit/integration/browser tests, build, dependency audit, tracked-file security checks and the existing reusable history secret scan.
+5. Vercel repository configuration disables automatic Git deployment (`git.deploymentEnabled: false`), documented at https://vercel.com/docs/project-configuration/git-configuration. Source change does not prove live project enforcement. Header configuration preserves Content-Security-Policy with script-src self, HSTS, MIME sniffing, framing, referrer and browser capability protections. The development server uses the same headers; application JavaScript is extracted to app.js.
 
 ## Auth, privacy and deployment limitations
 
@@ -26,7 +26,7 @@ Standard mode remains free and works without cloud credentials. Optional cloud s
 
 Browser-local scenario storage is readable by scripts running on this origin and survives reloads. Cloud guest cookies provide possession-based access; clearing cookies can lose access. Do not describe this as an account-backed identity or end-to-end encryption. No paid service introduced.
 
-Rate limiting for public calculations/anonymous account creation and bounded scenario retention must be configured and verified at host/provider level before enabling optional public cloud saves. An in-memory process limiter is not a verified distributed/serverless control. CSP requires coordination with the current inline scripts/styles and has not been enforced here.
+The newer main branch distributed rate limiter is preserved: shared Redis atomic counters, HMAC identity keys and production fail-closed behavior when Redis credentials or the 32-character rate-limit secret are unavailable. API fixtures intentionally inject a no-op limiter; separate limiter tests exercise limiting and configuration failures. Live Redis/provider configuration remains unverified. Health reports server calculation availability false when production protection is unconfigured so the free standard calculator retains its browser engine; this is configuration screening, not a live Redis availability check. Bounded scenario retention must be verified before enabling cloud saves. Local process counters are development-only. CSP is preserved and local serving now applies it; browser enforcement still requires successful E2E execution.
 
 GitHub branch-protection API denied integration access; enforcement is **unverified**, not claimed absent. Configure required `tests-build-security` status check on main and protected release environment; independently verify Vercel deployment checks or keep automatic deployment disabled. No production deploy or merge was performed.
 
