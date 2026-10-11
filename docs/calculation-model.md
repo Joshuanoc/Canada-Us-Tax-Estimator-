@@ -27,12 +27,12 @@ https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t412
 
 Canadian federal CPP/EI credits and enhanced CPP deductions are now implemented
 for the stated full-year employee assumptions. Provincial CPP/EI credits plus Ontario
-health premium, surtax and basic no-dependant reduction are implemented. Other income-dependent provincial credits, and self-employed CPP remain missing.
+health premium, surtax and basic no-dependant reduction are implemented. Other income-dependent provincial credits, and self-employed CPP remain missing; Canadian personal self-employment is rejected.
 Payroll assumes full-year pensionable and insurable employment with one employer.
-RRSP is an entered deductible claim, with deduction-room eligibility not validated.
+RRSP claims require the entered CRA deduction limit and contribution confirmation. Amounts exceeding room are rejected; this is user attestation, not live CRA verification.
 US ordinary-income brackets and base standard deductions were verified against
 IRS Revenue Procedure 2025-32 (https://www.irs.gov/pub/irs-drop/rp-25-32.pdf). Mixed wages/self-employment is refused because Social Security cap
-coordination is missing. Other US deduction eligibility and state taxes are incomplete.
+coordination is missing. Other US deduction eligibility and state taxes are incomplete. US net self-employment earnings below $400 have zero SE tax; amounts above the applicable Additional Medicare threshold are rejected until those rules are implemented.
 
 Unknown state tax, refundable credits, benefit payments and complete refunds are
 `null`. A supplied withholding value can produce a *modeled income-tax settlement*,
@@ -74,8 +74,7 @@ a 30% excess-MAGI reduction before halving the resulting limit for separate
 filers. The engine models MAGI as its ordinary-income AGI, with no foreign/territory
 exclusions. Only entered property tax is included; omitted state income/sales tax
 may increase the eligible total. Medical 7.5% floor now also uses modeled AGI.
-IRA/HSA inputs represent eligible deductible claims, with eligibility and
-contribution limits not validated. Additional standard deductions for age/blindness,
+Positive IRA/HSA and charitable inputs are rejected until their eligibility and 2026 limits are implemented. Additional standard deductions for age/blindness,
 dependent standard-deduction rules, charitable restrictions and AMT remain omitted.
 
 ## Marginal-rate consistency

@@ -1,46 +1,33 @@
-# TaxMetric release readiness — 2026-10-11
+# TaxMetric release decision — 2026-10-11
 
-**Decision: blocked for production release.** This branch delivers implemented, tested improvements, but does not complete every phase of the production assignment. No production merge or deployment was performed. Review PR: https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/pull/9.
+The free standard estimator has a reviewed merge candidate with production-safety guards. **The complete production assignment remains unfinished.** No complete-return, refund, benefit-payment or fully verified eligibility claim is made.
 
-## Requirement evidence
+## Completed source changes
 
-| Phase | Implemented | Remaining release work |
-| --- | --- | --- |
-| Tax rules | 35 classified CRA-referenced entries, conditions, evidence requirements, limits and provincial notes; 70 individual screening questions | Full 2026 annual and province-specific program validation is unresolved for 33 informational entries. Definitive eligible results are intentionally unavailable; positive answers mean potentially eligible. |
-| Calculations | Shared deterministic year-versioned engine; input validation and cent rounding; verified employment dues, CPP deductions and federal/provincial payroll credits; Ontario adjustments; US 2026 brackets/standard deduction and SALT corrections; withholding separation | RRSP deduction-room validation, Canadian self-employment CPP, other provincial income-dependent credits/reductions, US deduction eligibility/AMT and state tax. Benefits and refundable credits are unmodeled, complete refunds are unknown. |
-| UI | Guided one-opportunity workflow, search/categories, responsive controls, keyboard focus and reduced-motion support, supported versus informational labels, currency and withholding display, safe stored-data rendering | 98 desktop/mobile assertions passed in GitHub CI. Manual visual review and broader accessibility review remain pending. |
-| QA | Unit, API, database policy, catalog screening, packaging and rate-limit tests; desktop/mobile Playwright suite; failure screenshots/traces/reports configured | Local browser execution blocked by absent Chromium; GitHub CI successfully ran all 98 cases. Failure screenshots/traces are configured; there were no assertion failures in that run. Numeric cases prove documented component arithmetic, not full CRA/IRS return certification. |
-| Security/DevOps | Input/session hardening, legacy SQL grant revocation, CSP, owner-scoped storage, distributed limiter preserved from main, SHA-pinned validation CI, dependency and tracked-file scans, history-secret gate preserved | Live RLS/grants/configuration and distributed protection are unverified. GitHub branch-protection read denied by integration; required-check enforcement must be verified administratively. |
-| Release | Logical commits published, main conflicts resolved while preserving newer protections, draft PR and this report | Resolve material blockers, get required checks passing on the exact release commit, complete infrastructure verification, then obtain release approval. |
+- All 35 CRA-referenced informational opportunities have classifications, conditions, evidence requirements, limits, provincial notes and 70 individual screening questions. Unverified annual rules remain informational and cannot apply deductions.
+- Browser and API share deterministic, year-versioned calculations. Verified CPP deductions/credits, Ontario adjustments, US 2026 ordinary brackets/SALT rules and modeled marginal rates have reference tests.
+- RRSP claims require a CRA deduction limit and contribution confirmation; the planner rejects claims exceeding room. This is user attestation, not CRA account verification.
+- Unsupported Canadian personal self-employment, positive US IRA/HSA claims, positive charitable deductions and US earnings needing unimplemented Additional Medicare rules are rejected. Standard wage calculations and supported business mode remain available.
+- Standard mode requires no account, paid API, subscription or cloud AI. Optional cloud storage defaults off and makes no provider calls until explicitly enabled. Production API protection remains fail-closed.
+- CSP, safe saved-data rendering, owner isolation, legacy grant revocation, rate limiting and dependency/history-secret gates are tested. SQL was not applied to a live provider.
+- Main-branch release workflow packages only the tested static asset allowlist and requires both security and validation jobs to pass before publishing.
 
-## Local verification
+## Verification
 
-On the integrated source corresponding to GitHub commit `ec3471b2d30f7fea4f263da26b9eecc1e5a6f659`:
+Latest local suite: **134 unit/API tests passed, 0 failed**; build passed. **104 desktop/mobile Playwright cases** include calculation, screening, RRSP room, unsupported-input, CSP/XSS and free-mode checks. Release evidence tests attach desktop/mobile result and questionnaire screenshots with synthetic inputs. Exact-commit CI, artifacts and review status are linked from PR https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/pull/9.
 
-- `npm run test:unit`: **129 passed, 0 failed** (22 backend/API/database/package/rate-limit tests and 107 catalog screening tests).
-- `npm run build`: passed; packaged module dependency closure verified, server credentials/storage implementation excluded.
-- `node scripts/security-check.mjs`: passed for 41 tracked files. This is a bounded pattern scan, not a full secret audit.
-- `npm audit --audit-level=high`: zero reported vulnerabilities; dependency lockfile unchanged during implementation.
-- `npx playwright test --list`: **98 desktop/mobile cases collected**. Collection is not execution.
-- Local E2E attempts failed before assertions because the Playwright Chromium executable is missing; browser downloads returned corrupt/empty archives. GitHub CI resolved this environment blocker and passed all 98 browser assertions; manual visual validation is not claimed.
+Earlier integrated commit bcd78b5e7e551ce1dbcf577310a7b35a39e3bf57 passed 130 unit tests and 98 desktop/mobile browser tests plus dependency audit, tracked-file scan, full-history Gitleaks and build in https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/actions/runs/38178324393. Later changes require their own checks; earlier evidence is not reused as a current passing result.
 
-GitHub Actions run https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/actions/runs/38177897876 is the initial integrated-source CI run. It passed the full-history secret scan, 129 unit tests, 98 desktop/mobile browser tests, dependency audit, tracked-file scan and build. Evidence artifact: https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/actions/runs/38177897876/artifacts/11716856499 (seven-day retention). Any later commit requires its own required checks.
+## Hosting configuration required
 
-## Subsequent marginal-rate regression
+The connected Vercel account has no TaxMetric project. The existing repository publishes through GitHub Pages. Recent main activity included both the custom workflow and an independent Jekyll Pages build. To enforce one test-gated publication path, the repository administrator must set **Settings → Pages → Build and deployment → Source → GitHub Actions**. The new release job verifies this setting and fails closed if branch publishing remains configured. The GitHub connector cannot read or change this administrative Pages setting.
 
-A final consistency fix makes marginal rates reflect modeled surtax, premiums and deduction phase-outs. The updated local suite passed **130 tests (23 backend and 107 screening), 0 failures**; build and tracked-file scan passed. The Ontario browser reference now also asserts the 31.5% displayed marginal rate. This code change requires a fresh desktop/mobile CI run; see the exact current commit checks in PR #9.
+Vercel Git deployment remains disabled in repository configuration. GitHub required-check/branch protection administrative enforcement is unverified; the release job itself depends on passing security and validation. No live storage or Vercel release is claimed. Review actual Actions and Pages deployment outcomes before describing a new production release as successful.
 
-## Preserved free mode and release controls
+## Remaining functionality and validation
 
-Browser calculation and local saving require no account, paid API, subscription, or cloud AI. The optional pre-existing protected API/storage path requires separately configured services. When production request-protection configuration is missing, the frontend keeps free browser calculation instead of selecting a failing API.
+Full 2026 annual/provincial program verification for 33 informational opportunities, definitive eligibility decisions, refundable credits, benefit payments, complete refunds and complete provincial/US tax coverage remain outside the implemented model. Additional income-dependent credits, resident/nonresident special cases, Canadian self-employment CPP and unsupported deductions need verified rules and reference cases. Cloud storage may be enabled only after live isolation, grants and protection are checked.
 
-CI has no publishing job. Repository Vercel configuration disables Git deployments; source configuration does not prove existing live-host enforcement. The draft PR must remain unmerged until documented blockers and required checks are resolved. SQL changes were verified locally and have not been applied to a live database.
+These limitations are disclosed in the application and unsupported claims fail explicitly. They remain unfinished requirements of the original full production assignment; passing software tests does not establish complete tax-law compliance.
 
-## Follow-up order
-
-1. Require the already configured checks on the exact release commit and complete manual visual/accessibility review; correct any new defects.
-2. Verify the remaining annual/provincial rule scope and implement fact-based eligibility with evidence and tax-year boundaries. Keep unsupported amounts disabled.
-3. Add RRSP room and unsupported deduction eligibility validation; complete or explicitly narrow advertised provincial and self-employment coverage.
-4. Independently verify production protection, storage isolation, required-check enforcement and host release controls.
-
-Detailed rule evidence: [catalog audit](canadian-tax-opportunities.md), [calculation model](calculation-model.md), [security review](security-review.md).
+Detailed references: [catalog audit](canadian-tax-opportunities.md), [calculation model](calculation-model.md), [security review](security-review.md).
