@@ -225,7 +225,17 @@ export function calculate(raw){
     }else{
       note='Pass-through entity: net business income shown; owner-level tax not included here.';
       inc=[[true,'Revenue, COGS and entered expenses'],[false,'Owner-level personal tax'],[false,'Entity-specific special rules']]
-    }return finalize(makeResult(revenue,cogs+expenses,Math.max(net,0),federal,0,0,0,note,inc,silent))
+    }
+    const result=makeResult(revenue,cogs+expenses,Math.max(net,0),federal,0,0,0,note,inc,silent);
+    const corporate=(c==='us'&&t==='c_corp')||(c==='ca'&&t==='corp_general');
+    result.netBusinessIncome=roundMoney(net);
+    result.after=net-result.estimated;
+    result.monthly=result.after/12;
+    result.ownerIncomeTax=corporate?undefined:null;
+    result.scope=corporate?'Net business income less modeled federal corporate tax; regional taxes and special rules excluded':'Net business income before owner-level tax; owner tax is unknown';
+    result.assumptions=['Entered revenue, COGS and expenses are supported business amounts','No loss carrybacks, carryforwards or entity-specific expense eligibility modeled'];
+    result.limitations=corporate?['Regional corporate taxes and credits are not modeled','Entity-specific deductions and special tax provisions are incomplete']:['Owner-level personal income tax and payroll obligations are not modeled'];
+    return finalize(result);
   }
  return mode==='personal'?personalCalculation():businessCalculation();
   

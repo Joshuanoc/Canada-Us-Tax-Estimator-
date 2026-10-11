@@ -3,6 +3,22 @@ import { saltDeduction2026 } from '../../backend/tax-rules-2026.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculate, normalizeInput } from '../../backend/tax.js';
+test('business cash flow uses net income after costs and preserves losses',()=>{
+  const base={mode:'business',businessType:'c_corp',grossReceipts:100000,advertising:90000};
+  const corporation=calculate(base);
+  assert.equal(corporation.netBusinessIncome,10000);
+  assert.equal(corporation.estimated,2100);
+  assert.equal(corporation.after,7900);
+  assert.equal(corporation.monthly,658.33);
+  const loss=calculate({...base,advertising:110000});
+  assert.equal(loss.netBusinessIncome,-10000);
+  assert.equal(loss.estimated,0);
+  assert.equal(loss.after,-10000);
+  const passthrough=calculate({...base,businessType:'sole'});
+  assert.equal(passthrough.after,10000);
+  assert.equal(passthrough.ownerIncomeTax,null);
+  assert.match(passthrough.scope,/before owner-level tax/);
+});
 test('RRSP claims require deduction room and separate contribution confirmation',()=>{
   const input={country:'ca',subRegion:'ON',wages:100000,rrspContrib:1000};
   assert.throws(()=>calculate(input),/deduction limit/);
