@@ -14,7 +14,8 @@ function render(){
  if(!entry){list.append(node('p','No matches. Clear the search or select another category.'));return;}
  const card=node('article',undefined,'opportunity-card');card.dataset.opportunity=entry.id;
  card.append(node('span',groups[entry.group],'opportunity-meta'),node('h3',entry.name));
- card.append(node('p',`${(entry.classification||'Review pending').replaceAll('_',' ')} · ${entry.calculationEnabled?'Included only when supported inputs are entered':'Information only — not added to your calculation'}`,'opportunity-meta'));
+ const application=entry.calculationSupport?.implemented?(entry.id==='canada-employment-amount'?'Included in the supported employment estimate':'Available with confirmed deduction input'):'Information only — not added to your calculation';
+ card.append(node('p',`${(entry.classification||'Review pending').replaceAll('_',' ')} · ${application}`,'opportunity-meta'));
  const result=screenOpportunity(entry,answers.get(entry.id),context());const status=node('p',statuses[result.status],'opportunity-state');status.setAttribute('role','status');card.append(status,node('p',result.reason));
  bullets('Review the conditions',entry.eligibilityConditions,card);
  for(const question of questionsFor(entry)){
