@@ -14,6 +14,7 @@ export function createHandler({fetchImpl=fetch,env=process.env}={}){
   if(!response.ok){if(response.status===401||response.status===403)throw new HttpError(401,'Guest session expired.');throw new HttpError(502,'Storage service could not complete the request.');}
   return data;
  }
+ const decodeCookie=value=>{try{return decodeURIComponent(value);}catch{throw new HttpError(400,'Invalid session cookie.');}};
  const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').map(s=>s.trim().split('=')).filter(a=>a.length===2));
  function setSession(req,res,s){
   const secure=env.NODE_ENV==='production'||req.headers['x-forwarded-proto']==='https';
@@ -21,10 +22,10 @@ export function createHandler({fetchImpl=fetch,env=process.env}={}){
   res.setHeader('Set-Cookie',[`taxmetric_access=${encodeURIComponent(s.access_token)}; Max-Age=${Math.min(s.expires_in||3600,3600)}; ${attrs}`,`taxmetric_refresh=${encodeURIComponent(s.refresh_token)}; Max-Age=2592000; ${attrs}`]);
  }
  async function guest(req,res,create=false){
-  const stored=cookies(req);let token=stored.taxmetric_access?decodeURIComponent(stored.taxmetric_access):null;
+  const stored=cookies(req);let token=stored.taxmetric_access?decodeCookie(stored.taxmetric_access):null;
   if(token){try{const user=await provider('/auth/v1/user',{token});return {token,user};}catch(e){if(e.status!==401)throw e;}}
   let session;
-  if(stored.taxmetric_refresh){try{session=await provider('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:decodeURIComponent(stored.taxmetric_refresh)}});}catch(e){if(e.status!==401)throw e;throw new HttpError(401,'Guest session expired. Clear this site’s cookies to start a new session.');}}
+  if(stored.taxmetric_refresh){try{session=await provider('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:decodeCookie(stored.taxmetric_refresh)}});}catch(e){if(e.status!==401)throw e;throw new HttpError(401,'Guest session expired. Clear this site’s cookies to start a new session.');}}
   else if(create)session=await provider('/auth/v1/signup',{method:'POST',body:{data:{}}});
   else return null;
   if(!session?.access_token||!session?.refresh_token||!UUID.test(session.user?.id||''))throw new HttpError(502,'Guest session could not be established.');
@@ -43,7 +44,7 @@ export function createHandler({fetchImpl=fetch,env=process.env}={}){
    // Browser mutations must originate on this host; no permissive cross-origin credential access.
    if(!['GET','HEAD'].includes(req.method)){
     const origin=req.headers.origin;
-    if(origin){const host=req.headers['x-forwarded-host']||req.headers.host;if(new URL(origin).host!==host)throw new HttpError(403,'Cross-origin requests are not permitted.');}
+    if(origin){const host=req.headers['x-forwarded-host']||req.headers.host;let parsed;try{parsed=new URL(origin);}catch{throw new HttpError(403,'Invalid request origin.');}if(!['http:','https:'].includes(parsed.protocol)||parsed.host!==host)throw new HttpError(403,'Cross-origin requests are not permitted.');}
     if(req.headers['sec-fetch-site']==='cross-site')throw new HttpError(403,'Cross-site requests are not permitted.');
    }
    const url=new URL(req.url,'http://localhost'),path=url.pathname;
@@ -53,7 +54,7 @@ export function createHandler({fetchImpl=fetch,env=process.env}={}){
    }
    if(path==='/api/scenarios'){
     if(req.method==='POST'){
-     const raw=await body(req);let input,result;try{input=normalizeInput(raw.input);result=calculate(input);}catch(e){throw new HttpError(400,e.message);}
+     const raw=await body(req);if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new HttpError(400,'Scenario must be a JSON object.');let input,result;try{input=normalizeInput(raw.input);result=calculate(input);}catch(e){throw new HttpError(400,e.message);}
      if(raw.name!==undefined&&(typeof raw.name!=='string'||raw.name.length>100))throw new HttpError(400,'Scenario name must be at most 100 characters.');
      const session=await guest(req,res,true);
      const data=await provider('/rest/v1/scenarios',{method:'POST',token:session.token,body:{owner_id:session.user.id,name:raw.name||'Saved scenario',input,result}});return send(201,{scenario:data?.[0]});

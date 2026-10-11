@@ -9,7 +9,7 @@ create table if not exists public.scenarios (
 );
 create index if not exists scenarios_owner_created_idx on public.scenarios(owner_id, created_at desc);
 alter table public.scenarios enable row level security;
-revoke all on public.scenarios from anon;
+revoke all on public.scenarios from anon, authenticated;
 grant select, insert, delete on public.scenarios to authenticated;
 drop policy if exists scenarios_owner_select on public.scenarios;
 create policy scenarios_owner_select on public.scenarios for select to authenticated using (auth.uid() = owner_id);

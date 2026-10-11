@@ -75,3 +75,10 @@ test('guest cloud UI saves, loads and deletes scenarios without rendering a name
  await page.locator('#wages').fill('1');await page.getByRole('button',{name:'Load',exact:true}).click();await expect(page.locator('#wages')).toHaveValue('100000');
  await page.locator('[data-del]').click();await expect(page.locator('.saved-item')).toHaveCount(0);
 });
+
+test('local saved scenario text cannot create executable markup',async({page})=>{
+ await page.evaluate(()=>localStorage.setItem('taxmetric_saved',JSON.stringify([{country:'us',subRegion:'<img src=x onerror="window.savedInjected=true">',mode:'personal',timestamp:Date.now(),estimated:1,after:1}])));
+ await page.reload();
+ await expect(page.locator('#savedCalculations img')).toHaveCount(0);
+ expect(await page.evaluate(()=>window.savedInjected)).toBeUndefined();
+});

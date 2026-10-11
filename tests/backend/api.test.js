@@ -42,3 +42,12 @@ test('Canadian and corporate computations preserve the existing model',()=>{
  assert.equal(calculate({mode:'business',businessType:'c_corp',grossReceipts:100000,advertising:10000}).estimated,18900);
  assert.throws(()=>calculate({mode:'business',grossReceipts:100,returnsAllowances:101}),/cannot exceed/);
 });
+test('malformed JSON shapes, oversized payloads and session cookies are rejected explicitly',async t=>{
+ const url=await server(t,{env});
+ assert.equal((await post(url+'/api/scenarios',null)).status,400);
+ assert.equal((await post(url+'/api/scenarios',[])).status,400);
+ assert.equal((await post(url+'/api/calculate',{padding:'x'.repeat(17000)})).status,413);
+ assert.equal((await fetch(url+'/api/scenarios',{headers:{Cookie:'taxmetric_access=%ZZ'}})).status,400);
+ assert.equal((await post(url+'/api/calculate',{}, {Origin:'null'})).status,403);
+ assert.equal((await post(url+'/api/calculate',{}, {'Sec-Fetch-Site':'cross-site'})).status,403);
+});
