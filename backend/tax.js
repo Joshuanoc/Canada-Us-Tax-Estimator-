@@ -1,3 +1,4 @@
+import { ontarioAdjustments } from './ontario-2026.js';
 import {
    roundMoney, settlement 
 } from './calculation-contract.js';
@@ -46,11 +47,13 @@ function caFederalTax(taxable,wages,payroll){
   tax-=(payroll.baseCpp+payroll.ei)*.14;
   return Math.max(tax,0)
 }
-function caProvinceTax(taxable,prov){
+function caProvinceTax(taxable,prov,payroll){
   if(!prov||!caProv[prov])return 0;
   let tax=progressive(taxable,caProv[prov]);
   if(provBPA[prov])tax-=provBPA[prov]*caProv[prov][0][1];
-  return Math.max(tax,0)
+  tax-=(payroll.baseCpp+payroll.ei)*caProv[prov][0][1];
+  const basic=Math.max(tax,0);
+  return prov==='ON'?ontarioAdjustments(basic,taxable).total:basic;
 }
 function usSeTax(se){
   if(se<=0)return 0;
@@ -127,7 +130,7 @@ export function calculate(raw){
   const estimated=Math.max(federal+region,0),after=total-estimated-payroll;
     
   return {
-      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP amount is a user-confirmed deductible claim within available CRA deduction room']:['Ordinary income only; deduction eligibility is user-confirmed','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Provincial CPP/EI credits are not modeled','Ontario surtax and health premium are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
+      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP amount is a user-confirmed deductible claim within available CRA deduction room']:['Ordinary income only; deduction eligibility is user-confirmed','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Ontario dependant tax-reduction supplements are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
         federalIncomeTax:roundMoney(federal),provincialIncomeTax:input.country==='ca'&&input.subRegion?roundMoney(region):null,stateIncomeTax:null,payrollContributions:input.country==='ca'?roundMoney(payroll):null
       }
     };
@@ -165,7 +168,7 @@ export function calculate(raw){
       deductions=val('rrspContrib')+val('eligibleEmploymentDues')+p.enhancedCpp;
       const taxable=Math.max(total-deductions,0),prov=$('subRegion').value;
       federal=caFederalTax(taxable,w,p);
-      region=caProvinceTax(taxable,prov);
+      region=caProvinceTax(taxable,prov,p);
       payroll=p.total;
       marginal=(rateAt(taxable,caFederal)+(prov&&caProv[prov]?rateAt(taxable,caProv[prov]):0))*100;
       note='Federal/provincial bracket tax includes the federal basic personal credit, Canada Employment Amount, and selected provincial BPA credits where available. CPP/EI are shown as cash-flow deductions, not income tax.';
@@ -175,6 +178,7 @@ export function calculate(raw){
         cpp:roundMoney(p.cpp),baseCpp:roundMoney(p.baseCpp),enhancedCppDeduction:roundMoney(p.enhancedCpp),cpp2:roundMoney(p.cpp2),ei:roundMoney(p.ei),selfEmploymentCpp:se>0?null:0
       };
       result.appliedDeductions={rrsp:roundMoney(val('rrspContrib')),employmentDues:roundMoney(val('eligibleEmploymentDues')),enhancedCpp:roundMoney(p.enhancedCpp)};
+      result.provincialPayrollCredit=prov?roundMoney((p.baseCpp+p.ei)*caProv[prov][0][1]):null;
       result.federalPayrollCredit=roundMoney((p.baseCpp+p.ei)*.14);
       return finalize(result);
     }

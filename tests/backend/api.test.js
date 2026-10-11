@@ -37,8 +37,8 @@ test('missing storage fails explicitly and expired access tokens can refresh',as
  const url=await server(t,{env:{}});const r=await post(url+'/api/scenarios',{input:{wages:1}});assert.equal(r.status,503);
  const p=provider(),ready=await server(t,{env,fetchImpl:p.fetchImpl});const refreshed=await fetch(ready+'/api/scenarios',{headers:{Cookie:'taxmetric_access=expired; taxmetric_refresh=refresh-a'}});assert.equal(refreshed.status,200);assert.equal(refreshed.headers.getSetCookie().length,2);
 });
-test('Canadian and corporate computations preserve the existing model',()=>{
- const r=calculate({country:'ca',subRegion:'ON',wages:100000});assert.equal(Math.round(r.estimated),Math.round(58523*.14+(98873-58523)*.205-16452*.14-1501*.14-(3519.45+1123.07)*.14+53891*.0505+(98873-53891)*.0915-12989*.0505));
+test('Canadian verified payroll adjustments and corporate baseline computations',()=>{
+ const r=calculate({country:'ca',subRegion:'ON',wages:100000});assert.equal(r.federal,13301.60);assert.equal(r.regionTax,6722.75);
  assert.equal(calculate({mode:'business',businessType:'c_corp',grossReceipts:100000,advertising:10000}).estimated,18900);
  assert.throws(()=>calculate({mode:'business',grossReceipts:100,returnsAllowances:101}),/cannot exceed/);
 });

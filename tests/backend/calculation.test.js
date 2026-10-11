@@ -1,3 +1,4 @@
+import { ontarioAdjustments, ontarioHealthPremium } from '../../backend/ontario-2026.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculate, normalizeInput } from '../../backend/tax.js';
@@ -65,4 +66,11 @@ test('CRA 2026 full-year employment CPP/EI components, deductions and federal cr
   assert.equal(ympe.appliedDeductions.enhancedCpp, 711);
   assert.equal(calculate({ country: 'ca', wages: 85000 }).payrollComponents.cpp2, 416);
   assert.equal(calculate({ country: 'ca', wages: 85000.01 }).payrollComponents.cpp2, 416);
+});
+
+test('Ontario 2026 surtax, premium and basic reduction boundaries',()=>{
+ assert.equal(ontarioAdjustments(5818,100000).surtax,0);
+ assert.equal(ontarioAdjustments(7446,100000).surtax,325.6);
+ assert.equal(ontarioAdjustments(100,10000).total,0);
+ for(const [income,premium] of [[20000,0],[25000,300],[36000,300],[38500,450],[48000,450],[48600,600],[72000,600],[72600,750],[200000,750],[200600,900]])assert.equal(ontarioHealthPremium(income),premium);
 });

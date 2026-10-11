@@ -26,8 +26,8 @@ annual-return calculation:
 https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t4127-payroll-deductions-formulas/t4127-jan/t4127-jan-payroll-deductions-formulas-computer-programs.html
 
 Canadian federal CPP/EI credits and enhanced CPP deductions are now implemented
-for the stated full-year employee assumptions. Provincial CPP/EI credits, Ontario
-health premium and surtax, income-dependent provincial credits, and self-employed CPP remain missing.
+for the stated full-year employee assumptions. Provincial CPP/EI credits plus Ontario
+health premium, surtax and basic no-dependant reduction are implemented. Other income-dependent provincial credits, and self-employed CPP remain missing.
 Payroll assumes full-year pensionable and insurable employment with one employer.
 RRSP is an entered deductible claim, with deduction-room eligibility not validated.
 US tables and deductions are preserved baseline estimates, not newly certified by
@@ -57,3 +57,9 @@ the enhanced deduction. For100,000 wages: baseCPP3,519.45, enhancement711,
 CPP2 416, EI1,123.07; deductible enhancement1,127 and federal payroll credit
 649.9528. Federal bracket tax less BPA, employment and payroll credits is13,301.60.
 This is a documented component arithmetic case, not a complete CRA return comparison.
+
+Ontario2026 adjustments use the same CRA T4127 Ontario V1/V2/S formulas.
+The basic reduction excludes dependant supplements. At100,000 wages afterCPP
+deduction, taxable income98,873 gives provincial tax6,722.75 including
+provincial CPP/EI credit, surtax and750 health premium. Boundary tests cover each
+premium band and both surtax thresholds.
