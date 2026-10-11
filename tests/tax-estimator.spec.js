@@ -23,7 +23,7 @@ test('zero income produces zero tax and cash flow',async({page})=>{
 });
 test('Canadian Ontario wages calculates income tax separately from CPP/EI and RRSP savings',async({page})=>{
  await page.locator('#country').selectOption('ca');await page.locator('#subRegion').selectOption('ON');
- await page.locator('#wages').fill('100000');await submit(page);
+ await page.locator('#wages').fill('100000');await page.locator('#rrspDeductionLimit').fill('10000');await page.locator('#rrspClaimConfirmed').check();await submit(page);
  // Independently calculated expectations for the repository's stated 2026 model, not a full tax-law certification.
  const federal=58523*.14+(98873-58523)*.205-16452*.14-1501*.14-(3519.45+1123.07)*.14;
  const basic=53891*.0505+(98873-53891)*.0915-12989*.0505-(3519.45+1123.07)*.0505;
@@ -102,4 +102,15 @@ test('free standard mode works when protected calculation API is unavailable',as
  await page.reload();await expect(page.locator('#cloudStatus')).toContainText('Free standard mode');
  await page.evaluate(()=>taxEngineReady);await page.locator('#wages').fill('100000');await submit(page);
  await expect(page.locator('#estimatedTax')).toContainText('13,170');expect(calls).toBe(0);
+});
+
+test('RRSP claims and planner require confirmed CRA room',async({page})=>{
+ await page.locator('#country').selectOption('ca');await page.locator('#subRegion').selectOption('ON');await page.locator('#wages').fill('100000');
+ await page.locator('#rrspContrib').fill('1000');await submit(page);await expect(page.locator('#errorBox')).toContainText('RRSP deduction limit');
+ await page.locator('#rrspDeductionLimit').fill('999');await submit(page);await expect(page.locator('#errorBox')).toContainText('cannot exceed');
+ await page.locator('#rrspDeductionLimit').fill('2000');await submit(page);await expect(page.locator('#errorBox')).toContainText('Confirm');
+ await page.locator('#rrspClaimConfirmed').check();await submit(page);await expect(page.locator('#resultsPanel')).toBeVisible();
+ await page.locator('#rrspWhatIf').fill('1001');await expect(page.locator('#rrspSavings')).toHaveText('Not calculated');await expect(page.locator('#rrspPlannerMessage')).toContainText('cannot exceed');
+ await page.locator('#rrspWhatIf').fill('1000');await expect(page.locator('#rrspSavings')).not.toHaveText('Not calculated');
+ await expect(page.locator('#modelAssumptions')).toContainText('Full-year resident');await expect(page.locator('#modelLimitations')).toContainText('incomplete');
 });
