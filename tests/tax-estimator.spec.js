@@ -75,3 +75,16 @@ test('guest cloud UI saves, loads and deletes scenarios without rendering a name
  await page.locator('#wages').fill('1');await page.getByRole('button',{name:'Load',exact:true}).click();await expect(page.locator('#wages')).toHaveValue('100000');
  await page.locator('[data-del]').click();await expect(page.locator('.saved-item')).toHaveCount(0);
 });
+
+
+test('browser-saved hostile text never creates HTML elements',async({page})=>{
+ await page.evaluate(()=>localStorage.setItem('taxmetric_saved',JSON.stringify([{country:'us',subRegion:'<img src=x onerror=alert(1)>',mode:'<svg onload=alert(1)>',timestamp:new Date().toISOString(),estimated:1,after:2}])));
+ await page.reload();await expect(page.locator('.saved-item')).toHaveCount(1);
+ await expect(page.locator('.saved-item img, .saved-item svg')).toHaveCount(0);
+ await expect(page.locator('.saved-item')).toContainText('<img src=x onerror=alert(1)>');
+});
+test('CSP rejects inline scripts while calculations work',async({page})=>{
+ await page.evaluate(()=>{const script=document.createElement('script');script.textContent='window.untrustedScriptRan=true';document.body.append(script)});
+ expect(await page.evaluate(()=>window.untrustedScriptRan)).toBeUndefined();
+ await page.locator('#wages').fill('100000');await submit(page);await expect(page.locator('#estimatedTax')).toContainText('13,170');
+});

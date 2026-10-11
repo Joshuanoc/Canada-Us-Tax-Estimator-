@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';import http from 'node:http';
 import{createHandler}from '../../backend/http.js';import{calculate}from '../../backend/tax.js';
 const A='11111111-1111-4111-8111-111111111111',B='22222222-2222-4222-8222-222222222222',ID='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
-async function server(t,options={}){const s=http.createServer(createHandler(options));await new Promise(r=>s.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>s.close(r)));return `http://127.0.0.1:${s.address().port}`;}
+async function server(t,options={}){const s=http.createServer(createHandler({rateLimit:async()=>{},...options}));await new Promise(r=>s.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>s.close(r)));return `http://127.0.0.1:${s.address().port}`;}
 const env={SUPABASE_URL:'https://example.supabase.co',SUPABASE_PUBLISHABLE_KEY:'test-public-key',NODE_ENV:'production'};
 function provider(){const rows=[];const calls=[];return{calls,rows,fetchImpl:async(url,opts)=>{
  calls.push({url,opts});const path=new URL(url);const token=opts.headers.Authorization?.replace('Bearer ','');const owner=token==='access-b'?B:A;
@@ -42,3 +42,4 @@ test('Canadian and corporate computations preserve the existing model',()=>{
  assert.equal(calculate({mode:'business',businessType:'c_corp',grossReceipts:100000,advertising:10000}).estimated,18900);
  assert.throws(()=>calculate({mode:'business',grossReceipts:100,returnsAllowances:101}),/cannot exceed/);
 });
+
