@@ -9,7 +9,7 @@
   if(!response.ok)throw new Error(data.error||'Request failed.');return data;
  };
  const collect=()=>{
-  const input={country:$('country').value,subRegion:$('subRegion').value,mode,filingStatus:$('filingStatus').value,businessType:$('businessType').value,standardDeduction:$('standardDeduction').checked};
+  const input={country:$('country').value,subRegion:$('subRegion').value,mode,filingStatus:$('filingStatus').value,businessType:$('businessType').value,standardDeduction:$('standardDeduction').checked,employmentDuesConfirmed:$('employmentDuesConfirmed')?.checked===true};
   document.querySelectorAll('input[type=number]').forEach(el=>{input[el.id]=Number(el.value||0)});return input;
  };
  const pending=async(button,work)=>{button.disabled=true;try{setError('');await work();}catch(e){setError(e.message);}finally{button.disabled=false;}};
