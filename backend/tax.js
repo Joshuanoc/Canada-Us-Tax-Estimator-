@@ -52,6 +52,7 @@ function caProvinceTax(taxable,prov,payroll){
 function usSeTax(se){
   if(se<=0)return 0;
   const net=se*.9235;
+  if(net<400)return 0;
   return Math.min(net,184500)*.124+net*.029
 }
 function completeness(items){
@@ -109,6 +110,11 @@ export function normalizeInput(raw){
      if(input.rrspContrib>rrspDeductionLimit)throw new Error('RRSP deduction claim cannot exceed your entered CRA deduction limit.');
      if(!input.rrspClaimConfirmed)throw new Error('Confirm that your RRSP deduction claim is supported by contribution receipts or available undeducted contributions.');
    }
+ }
+ if(country==='us'&&mode==='personal'){
+   if(input.charitableDonations>0)throw new Error('Charitable donation calculations are not supported pending 2026 deduction-floor and eligibility rules. Use zero for this ordinary-income estimate.');
+   const additionalMedicareThreshold=filingStatus==='married_joint'?250000:filingStatus==='married_separate'?125000:200000;
+   if(input.selfEmployment*.9235>additionalMedicareThreshold)throw new Error('Self-employment earnings above the Additional Medicare threshold require rules not supported by this estimator.');
  }
  if(country==='us'&&mode==='personal'&&(input.retirementContrib>0||input.hsaContrib>0))throw new Error('Positive IRA and HSA deductions require eligibility and contribution-limit rules not yet supported. Use zero for this ordinary-income estimate.');
  if(country==='us'&&mode==='personal'&&input.wages>0&&input.selfEmployment>0)throw new Error('Mixed US wages and self-employment require Social Security wage-cap coordination, which is not supported.');

@@ -18,7 +18,7 @@ function provider(){const rows=[];const calls=[];return{calls,rows,fetchImpl:asy
 const post=(url,body,headers={})=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify(body)});
 test('calculation API validates inputs and computes server-side results',async t=>{
  const url=await server(t,{env:{}});let r=await post(url+'/api/calculate',{wages:100000});assert.equal(r.status,200);assert.equal((await r.json()).result.estimated,13170);
- for(const input of [{wages:-1},{wages:'100000'},{country:'other'},{dividends:100},{wages:1e12},{standardDeduction:'false'},{subRegion:'QC',country:'ca'},{country:'ca',selfEmployment:1},{country:'ca',rrspContrib:100},{retirementContrib:1},{hsaContrib:1}]){r=await post(url+'/api/calculate',input);assert.equal(r.status,400);}
+ for(const input of [{wages:-1},{wages:'100000'},{country:'other'},{dividends:100},{wages:1e12},{standardDeduction:'false'},{subRegion:'QC',country:'ca'},{country:'ca',selfEmployment:1},{country:'ca',rrspContrib:100},{retirementContrib:1},{hsaContrib:1},{charitableDonations:1},{selfEmployment:220000}]){r=await post(url+'/api/calculate',input);assert.equal(r.status,400);}
  r=await post(url+'/api/calculate',{wages:100000},{Origin:'https://unrelated.example'});assert.equal(r.status,403);
 });
 test('anonymous save sets HttpOnly secure cookies and recomputes untrusted result',async t=>{

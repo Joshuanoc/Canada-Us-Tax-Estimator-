@@ -21,6 +21,16 @@ test('unsupported deduction and Canadian self-employment claims fail explicitly'
   assert.throws(()=>calculate({hsaContrib:1}),/IRA and HSA/);
   assert.equal(calculate({wages:100000}).estimated,13170);
 });
+test('US ordinary self-employment applies IRS net-earnings threshold and guards additional Medicare',()=>{
+  assert.equal(calculate({selfEmployment:433.13}).payroll,0);
+  assert.equal(calculate({selfEmployment:433.14}).payroll,61.20);
+  assert.throws(()=>calculate({selfEmployment:220000}),/Additional Medicare/);
+  assert.throws(()=>calculate({selfEmployment:140000,filingStatus:'married_separate'}),/Additional Medicare/);
+  assert.throws(()=>calculate({selfEmployment:280000,filingStatus:'married_joint'}),/Additional Medicare/);
+  assert.equal(calculate({selfEmployment:100000}).payroll,14129.55);
+  assert.throws(()=>calculate({charitableDonations:1,standardDeduction:false}),/Charitable donation/);
+  assert.throws(()=>calculate({charitableDonations:1}),/Charitable donation/);
+});
 
 test('modeled marginal income tax includes surtax and deduction phase-outs', () => {
   assert.equal(calculate({country:'ca',subRegion:'ON',wages:100000}).marginal,31.48);
