@@ -25,8 +25,9 @@ The engine retains the annual thresholds. Payroll formulas are not a complete
 annual-return calculation:
 https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t4127-payroll-deductions-formulas/t4127-jan/t4127-jan-payroll-deductions-formulas-computer-programs.html
 
-Canadian CPP enhanced deductions, CPP/EI tax credits, Ontario health premium and
-surtax, income-dependent provincial credits, and self-employed CPP remain missing.
+Canadian federal CPP/EI credits and enhanced CPP deductions are now implemented
+for the stated full-year employee assumptions. Provincial CPP/EI credits, Ontario
+health premium and surtax, income-dependent provincial credits, and self-employed CPP remain missing.
 Payroll assumes full-year pensionable and insurable employment with one employer.
 RRSP is an entered deductible claim, with deduction-room eligibility not validated.
 US tables and deductions are preserved baseline estimates, not newly certified by
@@ -46,3 +47,13 @@ mixed US payroll refusal, employment-dues confirmation and deduction arithmetic,
 and baseline Canadian/US/corporate regression checks. These checks establish
 software behavior; they do not certify a complete tax return. Missing items above
 remain production-release blockers for any claim of complete tax calculation.
+
+## Full-year Canadian employee payroll reference
+
+The official T4127 2026 tables8.3–8.7 verify CPP base4.95%, first enhancement1%,
+YMPE74,600, exemption3,500, CPP2 earnings74,600–85,000 at4%, and EI1.63%
+on up to68,900. The guide federal K2/F5 formulas separate the base credit from
+the enhanced deduction. For100,000 wages: baseCPP3,519.45, enhancement711,
+CPP2 416, EI1,123.07; deductible enhancement1,127 and federal payroll credit
+649.9528. Federal bracket tax less BPA, employment and payroll credits is13,301.60.
+This is a documented component arithmetic case, not a complete CRA return comparison.

@@ -28,21 +28,22 @@ function federalBPA(income){
 }
 function caPayroll(wages,prov){
   if(wages<=0||prov==='QC')return{
-    cpp:0,ei:0,total:0,supported:prov!=='QC'
+    cpp:0,baseCpp:0,enhancedCpp:0,cpp2:0,ei:0,total:0,supported:prov!=='QC'
   };
   const cpp1=Math.min(Math.max(wages-3500,0),71100)*.0595;
   const cpp2=Math.min(Math.max(wages-74600,0),10400)*.04;
   const ei=Math.min(wages,68900)*.0163;
   return{
-    cpp:cpp1+cpp2,ei,total:cpp1+cpp2+ei,supported:true
+    cpp:cpp1+cpp2,baseCpp:Math.min(Math.max(wages-3500,0),71100)*.0495,enhancedCpp:Math.min(Math.max(wages-3500,0),71100)*.01+cpp2,cpp2,ei,total:cpp1+cpp2+ei,supported:true
   }
 }
-function caFederalTax(taxable,wages){
+function caFederalTax(taxable,wages,payroll){
   let tax=progressive(taxable,caFederal);
   const bpa=federalBPA(taxable);
   const cea=Math.min(wages,1501);
   tax-=bpa*.14;
   tax-=cea*.14;
+  tax-=(payroll.baseCpp+payroll.ei)*.14;
   return Math.max(tax,0)
 }
 function caProvinceTax(taxable,prov){
@@ -126,7 +127,7 @@ export function calculate(raw){
   const estimated=Math.max(federal+region,0),after=total-estimated-payroll;
     
   return {
-      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP amount is a user-confirmed deductible claim within available CRA deduction room']:['Ordinary income only; deduction eligibility is user-confirmed','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Enhanced CPP deductions and CPP/EI income-tax credits are not modeled','Ontario surtax and health premium are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
+      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP amount is a user-confirmed deductible claim within available CRA deduction room']:['Ordinary income only; deduction eligibility is user-confirmed','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Provincial CPP/EI credits are not modeled','Ontario surtax and health premium are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
         federalIncomeTax:roundMoney(federal),provincialIncomeTax:input.country==='ca'&&input.subRegion?roundMoney(region):null,stateIncomeTax:null,payrollContributions:input.country==='ca'?roundMoney(payroll):null
       }
     };
@@ -160,19 +161,21 @@ export function calculate(raw){
       return finalize(result);
     }
     function personalCA(){
-      deductions=val('rrspContrib')+val('eligibleEmploymentDues');
+      const p=caPayroll(w,$('subRegion').value);
+      deductions=val('rrspContrib')+val('eligibleEmploymentDues')+p.enhancedCpp;
       const taxable=Math.max(total-deductions,0),prov=$('subRegion').value;
-      federal=caFederalTax(taxable,w);
+      federal=caFederalTax(taxable,w,p);
       region=caProvinceTax(taxable,prov);
-      const p=caPayroll(w,prov);
       payroll=p.total;
       marginal=(rateAt(taxable,caFederal)+(prov&&caProv[prov]?rateAt(taxable,caProv[prov]):0))*100;
       note='Federal/provincial bracket tax includes the federal basic personal credit, Canada Employment Amount, and selected provincial BPA credits where available. CPP/EI are shown as cash-flow deductions, not income tax.';
       inc=[[true,'2026 federal brackets'],[true,'Federal basic personal credit'],[true,'Canada Employment Amount'],[true,'RRSP deduction'],[!!prov,'Province/territory selected'],[!!provBPA[prov],provBPA[prov]?`${prov} basic personal credit`:'Province-specific BPA not modeled'],[p.supported,'CPP/CPP2 + EI payroll contribution'],[false,'CPP coordination for mixed employment + self-employment'],[false,'Many other federal/provincial credits & surtaxes'],[false,'Capital gains / dividend gross-up rules']];
       const result=makeResult(total,deductions,taxable,federal,region,payroll,marginal,note,inc,silent);
       result.payrollComponents={
-        cpp:roundMoney(p.cpp),ei:roundMoney(p.ei),selfEmploymentCpp:se>0?null:0
+        cpp:roundMoney(p.cpp),baseCpp:roundMoney(p.baseCpp),enhancedCppDeduction:roundMoney(p.enhancedCpp),cpp2:roundMoney(p.cpp2),ei:roundMoney(p.ei),selfEmploymentCpp:se>0?null:0
       };
+      result.appliedDeductions={rrsp:roundMoney(val('rrspContrib')),employmentDues:roundMoney(val('eligibleEmploymentDues')),enhancedCpp:roundMoney(p.enhancedCpp)};
+      result.federalPayrollCredit=roundMoney((p.baseCpp+p.ei)*.14);
       return finalize(result);
     }
     return c==='us'?personalUS():personalCA();

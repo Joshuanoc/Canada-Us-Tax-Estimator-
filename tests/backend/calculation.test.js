@@ -42,7 +42,27 @@ test('eligible employment dues require explicit confirmation and reduce income o
   assert.throws(() => calculate({ ...baseline, eligibleEmploymentDues: 1000 }), /confirmation/);
   assert.throws(() => calculate({ eligibleEmploymentDues: 1000, employmentDuesConfirmed: true }), /Canadian/);
   const r = calculate({ ...baseline, eligibleEmploymentDues: 1000, employmentDuesConfirmed: true });
-  assert.equal(r.deductions, 1000);
-  assert.equal(r.taxable, 64000);
+  assert.equal(r.appliedDeductions.employmentDues, 1000);
+  assert.equal(r.taxable, 63385);
   assert.ok(r.estimated < calculate(baseline).estimated);
+});
+test('CRA 2026 full-year employment CPP/EI components, deductions and federal credits', () => {
+  const r = calculate({ country: 'ca', subRegion: 'ON', wages: 100000 });
+  assert.equal(r.payrollComponents.baseCpp, 3519.45);
+  assert.equal(r.payrollComponents.cpp2, 416);
+  assert.equal(r.payrollComponents.enhancedCppDeduction, 1127);
+  assert.equal(r.payrollComponents.cpp, 4646.45);
+  assert.equal(r.payrollComponents.ei, 1123.07);
+  assert.equal(r.taxable, 98873);
+  assert.equal(r.federalPayrollCredit, 649.95);
+  // 8193.22 + 8271.75 - 2303.28 - 210.14 - 649.9528 = 13301.5972
+  assert.equal(r.federal, 13301.60);
+  const exempt = calculate({ country: 'ca', wages: 3500 });
+  assert.equal(exempt.payrollComponents.cpp, 0);
+  assert.equal(exempt.appliedDeductions.enhancedCpp, 0);
+  const ympe = calculate({ country: 'ca', wages: 74600 });
+  assert.equal(ympe.payrollComponents.cpp2, 0);
+  assert.equal(ympe.appliedDeductions.enhancedCpp, 711);
+  assert.equal(calculate({ country: 'ca', wages: 85000 }).payrollComponents.cpp2, 416);
+  assert.equal(calculate({ country: 'ca', wages: 85000.01 }).payrollComponents.cpp2, 416);
 });
