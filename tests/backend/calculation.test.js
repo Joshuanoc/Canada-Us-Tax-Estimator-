@@ -3,6 +3,24 @@ import { saltDeduction2026 } from '../../backend/tax-rules-2026.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculate, normalizeInput } from '../../backend/tax.js';
+test('RRSP claims require deduction room and separate contribution confirmation',()=>{
+  const input={country:'ca',subRegion:'ON',wages:100000,rrspContrib:1000};
+  assert.throws(()=>calculate(input),/deduction limit/);
+  assert.throws(()=>calculate({...input,rrspDeductionLimit:999,rrspClaimConfirmed:true}),/cannot exceed/);
+  assert.throws(()=>calculate({...input,rrspDeductionLimit:1000}),/contribution receipts/);
+  const result=calculate({...input,rrspDeductionLimit:1000,rrspClaimConfirmed:true});
+  assert.equal(result.appliedDeductions.rrsp,1000);
+  assert.equal(result.taxable,97873);
+  assert.equal(calculate({country:'ca',wages:100000,rrspDeductionLimit:0}).appliedDeductions.rrsp,0);
+  for(const rrspDeductionLimit of [-1,Infinity,'1000'])assert.throws(()=>normalizeInput({...input,rrspDeductionLimit}),/deduction limit/);
+  assert.throws(()=>normalizeInput({...input,rrspDeductionLimit:1000,rrspClaimConfirmed:'true'}),/confirmation/);
+});
+test('unsupported deduction and Canadian self-employment claims fail explicitly',()=>{
+  assert.throws(()=>calculate({country:'ca',selfEmployment:1}),/CPP coordination/);
+  assert.throws(()=>calculate({retirementContrib:1}),/IRA and HSA/);
+  assert.throws(()=>calculate({hsaContrib:1}),/IRA and HSA/);
+  assert.equal(calculate({wages:100000}).estimated,13170);
+});
 
 test('modeled marginal income tax includes surtax and deduction phase-outs', () => {
   assert.equal(calculate({country:'ca',subRegion:'ON',wages:100000}).marginal,31.48);

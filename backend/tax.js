@@ -84,12 +84,15 @@ export function normalizeInput(raw){
   
  if(taxYear!==2026)throw new Error('Only tax year 2026 is supported.');
   
+ const rrspDeductionLimit=raw.rrspDeductionLimit??null;
+ if(rrspDeductionLimit!==null&&(typeof rrspDeductionLimit!=='number'||!Number.isFinite(rrspDeductionLimit)||rrspDeductionLimit<0||rrspDeductionLimit>1e9))throw new Error('RRSP deduction limit must be a finite nonnegative number at most 1 billion.');
+ if(raw.rrspClaimConfirmed!==undefined&&typeof raw.rrspClaimConfirmed!=='boolean')throw new Error('RRSP claim confirmation must be a boolean.');
  const withholding=raw.withholding??null;
   
  if(withholding!==null&&(typeof withholding!=='number'||!Number.isFinite(withholding)||withholding<0||withholding>1e9))throw new Error('Withholding must be a finite nonnegative number at most 1 billion.');
   
  const input={
-    country,mode,subRegion,filingStatus,businessType,standardDeduction,taxYear,withholding,employmentDuesConfirmed:raw.employmentDuesConfirmed??false
+    country,mode,subRegion,filingStatus,businessType,standardDeduction,taxYear,withholding,rrspDeductionLimit,rrspClaimConfirmed:raw.rrspClaimConfirmed??false,employmentDuesConfirmed:raw.employmentDuesConfirmed??false
   };
   
  for(const field of numericFields){
@@ -99,6 +102,15 @@ export function normalizeInput(raw){
     input[field]=n;
     
   }
+ if(country==='ca'&&mode==='personal'){
+   if(input.selfEmployment>0)throw new Error('Canadian self-employment income requires CPP coordination not supported by this employment estimator.');
+   if(input.rrspContrib>0){
+     if(rrspDeductionLimit===null)throw new Error('Enter your available CRA RRSP deduction limit before claiming an RRSP deduction.');
+     if(input.rrspContrib>rrspDeductionLimit)throw new Error('RRSP deduction claim cannot exceed your entered CRA deduction limit.');
+     if(!input.rrspClaimConfirmed)throw new Error('Confirm that your RRSP deduction claim is supported by contribution receipts or available undeducted contributions.');
+   }
+ }
+ if(country==='us'&&mode==='personal'&&(input.retirementContrib>0||input.hsaContrib>0))throw new Error('Positive IRA and HSA deductions require eligibility and contribution-limit rules not yet supported. Use zero for this ordinary-income estimate.');
  if(country==='us'&&mode==='personal'&&input.wages>0&&input.selfEmployment>0)throw new Error('Mixed US wages and self-employment require Social Security wage-cap coordination, which is not supported.');
   
  if(input.eligibleEmploymentDues>0&&(country!=='ca'||mode!=='personal'||!input.employmentDuesConfirmed))throw new Error('Employment dues require Canadian personal mode and confirmation of eligible, nonduplicated employment dues.');
@@ -124,7 +136,7 @@ export function calculate(raw){
   const estimated=Math.max(federal+region,0),after=total-estimated-payroll;
     
   return {
-      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP amount is a user-confirmed deductible claim within available CRA deduction room']:['Ordinary income only; eligible deductible IRA/HSA claims are user-confirmed, contribution limits are not validated','SALT MAGI equals modeled AGI; no foreign-income exclusions or territory exclusions','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Ontario dependant tax-reduction supplements are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
+      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP claim is confirmed against receipts or undeducted contributions and an entered CRA deduction limit']:['Ordinary income only; positive IRA/HSA deductions are not supported','SALT MAGI equals modeled AGI; no foreign-income exclusions or territory exclusions','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Ontario dependant tax-reduction supplements are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
         federalIncomeTax:roundMoney(federal),provincialIncomeTax:input.country==='ca'&&input.subRegion?roundMoney(region):null,stateIncomeTax:null,payrollContributions:input.country==='ca'?roundMoney(payroll):null
       }
     };
