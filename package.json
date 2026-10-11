@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/serve.mjs",
-    "test": "npm run test:backend && playwright test",
+    "test": "npm run test:unit && playwright test",
     "build": "node scripts/build.mjs",
-    "test:backend": "node --test tests/backend/*.test.js"
+    "test:backend": "node --test tests/backend/*.test.js",
+    "test:unit": "node --test tests/backend/*.test.js tests/frontend/*.test.js"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.8",

@@ -9,11 +9,11 @@
   if(!response.ok)throw new Error(data.error||'Request failed.');return data;
  };
  const collect=()=>{
-  const input={country:$('country').value,subRegion:$('subRegion').value,mode,filingStatus:$('filingStatus').value,businessType:$('businessType').value,standardDeduction:$('standardDeduction').checked};
-  document.querySelectorAll('input[type=number]').forEach(el=>{input[el.id]=Number(el.value||0)});return input;
+  const input={country:$('country').value,subRegion:$('subRegion').value,mode,filingStatus:$('filingStatus').value,businessType:$('businessType').value,standardDeduction:$('standardDeduction').checked,employmentDuesConfirmed:$('employmentDuesConfirmed')?.checked===true,rrspClaimConfirmed:$('rrspClaimConfirmed')?.checked===true};
+  document.querySelectorAll('input[type=number]').forEach(el=>{input[el.id]=['withholding','rrspDeductionLimit'].includes(el.id)&&el.value===''?null:Number(el.value||0)});return input;
  };
  const pending=async(button,work)=>{button.disabled=true;try{setError('');await work();}catch(e){setError(e.message);}finally{button.disabled=false;}};
- async function calculateOnServer(){const input=collect();const data=await request('/api/calculate',{method:'POST',body:input});lastInput=input;renderResult(data.result);return data.result;}
+ async function calculateOnServer(){const input=collect();try{const data=await request('/api/calculate',{method:'POST',body:input});lastInput=input;renderResult(data.result);return data.result;}catch(error){$('resultsPanel').classList.add('hidden');$('planningPanel').classList.add('hidden');throw error;}}
  async function listScenarios(){
   const {scenarios}=await request('/api/scenarios');const box=$('savedCalculations');box.replaceChildren();
   if(!scenarios.length){const p=document.createElement('p');p.className='panel-desc';p.textContent='No cloud scenarios saved yet.';box.append(p);return;}
@@ -30,8 +30,8 @@
    item.append(content,load,del);box.append(item);
   }
  }
- try{const health=await request('/api/health');apiAvailable=health.status==='ok';storageAvailable=health.storageConfigured===true;}catch{}
- if(!apiAvailable){notice.textContent='This preview saves scenarios only in this browser. Cloud saving is available on the backend deployment.';return;}
+ try{const health=await request('/api/health');apiAvailable=health.status==='ok'&&health.calculationApiAvailable!==false;storageAvailable=health.storageConfigured===true;}catch{}
+ if(!apiAvailable){notice.textContent='Free standard mode calculates and saves in this browser. The protected calculation service is unavailable; no account or cloud service is required.';return;}
  $('calculateBtn').onclick=()=>pending($('calculateBtn'),calculateOnServer);
  $('saveScenarioBtn').onclick=()=>pending($('saveScenarioBtn'),async()=>{scenarioA=await calculateOnServer();$('saveScenarioBtn').textContent='✓ Scenario A saved';});
  if(!storageAvailable){notice.textContent='Cloud saving is not connected yet. Calculations run on the server; saves remain in this browser.';return;}

@@ -23,15 +23,17 @@ test('zero income produces zero tax and cash flow',async({page})=>{
 });
 test('Canadian Ontario wages calculates income tax separately from CPP/EI and RRSP savings',async({page})=>{
  await page.locator('#country').selectOption('ca');await page.locator('#subRegion').selectOption('ON');
- await page.locator('#wages').fill('100000');await submit(page);
+ await page.locator('#wages').fill('100000');await page.locator('#rrspDeductionLimit').fill('10000');await page.locator('#rrspClaimConfirmed').check();await submit(page);
  // Independently calculated expectations for the repository's stated 2026 model, not a full tax-law certification.
- const federal=58523*.14+(100000-58523)*.205-16452*.14-1501*.14;
- const provincial=53891*.0505+(100000-53891)*.0915-12989*.0505;
+ const federal=58523*.14+(98873-58523)*.205-16452*.14-1501*.14-(3519.45+1123.07)*.14;
+ const basic=53891*.0505+(98873-53891)*.0915-12989*.0505-(3519.45+1123.07)*.0505;
+ const provincial=basic+Math.max(basic-5818,0)*.20+750;
  const payroll=71100*.0595+10400*.04+68900*.0163;
  expect(await amount(page,'estimatedTax')).toBe(Math.round(federal+provincial));
  expect(await amount(page,'payrollTax')).toBe(Math.round(payroll));
  expect(await amount(page,'afterTax')).toBe(Math.round(100000-federal-provincial-payroll));
- await expect(page.locator('#planningPanel')).toBeVisible();await page.locator('#rrspWhatIf').fill('1000');expect(await amount(page,'rrspSavings')).toBe(297);
+ await expect(page.locator('#marginalRate')).toHaveText('31.5%');
+ await expect(page.locator('#planningPanel')).toBeVisible();await page.locator('#rrspWhatIf').fill('1000');expect(await amount(page,'rrspSavings')).toBe(315);
 });
 test('negative income and unsupported dividend income are rejected',async({page})=>{
  await page.locator('#wages').fill('-1');await submit(page);await expect(page.locator('#errorBox')).toContainText('cannot be negative');
@@ -41,7 +43,7 @@ test('negative income and unsupported dividend income are rejected',async({page}
 test('corporate net income uses the federal corporate rate and rejects impossible returns',async({page})=>{
  await page.locator('#businessBtn').click();await page.locator('#businessType').selectOption('c_corp');
  await page.locator('#grossReceipts').fill('100000');await page.locator('#advertising').fill('10000');await submit(page);
- expect(await amount(page,'taxableIncome')).toBe(90000);expect(await amount(page,'estimatedTax')).toBe(18900);
+ expect(await amount(page,'taxableIncome')).toBe(90000);expect(await amount(page,'estimatedTax')).toBe(18900);expect(await amount(page,'afterTax')).toBe(71100);expect(await amount(page,'monthlyTakeHome')).toBe(5925);await expect(page.locator('#afterTaxLabel')).toContainText('after-tax profit');await expect(page.locator('#afterTaxBasis')).toContainText('not cash flow');
  await page.locator('#returnsAllowances').fill('100001');await submit(page);await expect(page.locator('#errorBox')).toContainText('cannot exceed gross receipts');
 });
 test('saved calculations survive reload and can be deleted',async({page})=>{
@@ -76,15 +78,45 @@ test('guest cloud UI saves, loads and deletes scenarios without rendering a name
  await page.locator('[data-del]').click();await expect(page.locator('.saved-item')).toHaveCount(0);
 });
 
-
-test('browser-saved hostile text never creates HTML elements',async({page})=>{
- await page.evaluate(()=>localStorage.setItem('taxmetric_saved',JSON.stringify([{country:'us',subRegion:'<img src=x onerror=alert(1)>',mode:'<svg onload=alert(1)>',timestamp:new Date().toISOString(),estimated:1,after:2}])));
+test('local saved scenario text cannot create executable markup',async({page})=>{
+ await page.evaluate(()=>localStorage.setItem('taxmetric_saved',JSON.stringify([{country:'us',subRegion:'<img src=x onerror="window.savedInjected=true">',mode:'personal',timestamp:Date.now(),estimated:1,after:1}])));
  await page.reload();await expect(page.locator('.saved-item')).toHaveCount(1);
- await expect(page.locator('.saved-item img, .saved-item svg')).toHaveCount(0);
- await expect(page.locator('.saved-item')).toContainText('<img src=x onerror=alert(1)>');
+ await expect(page.locator('#savedCalculations img')).toHaveCount(0);
+ expect(await page.evaluate(()=>window.savedInjected)).toBeUndefined();
+});
+test('browser-saved hostile invalid mode is discarded',async({page})=>{
+ await page.evaluate(()=>localStorage.setItem('taxmetric_saved',JSON.stringify([{country:'us',subRegion:'<img src=x onerror=alert(1)>',mode:'<svg onload=alert(1)>',timestamp:new Date().toISOString(),estimated:1,after:2}])));
+ await page.reload();await expect(page.locator('.saved-item')).toHaveCount(0);
+ await expect(page.locator('#savedCalculations img, #savedCalculations svg')).toHaveCount(0);
 });
 test('CSP rejects inline scripts while calculations work',async({page})=>{
  await page.evaluate(()=>{const script=document.createElement('script');script.textContent='window.untrustedScriptRan=true';document.body.append(script)});
  expect(await page.evaluate(()=>window.untrustedScriptRan)).toBeUndefined();
  await page.locator('#wages').fill('100000');await submit(page);await expect(page.locator('#estimatedTax')).toContainText('13,170');
+});
+
+test('free standard mode works when protected calculation API is unavailable',async({page})=>{
+ let calls=0;
+ await page.route('**/api/health',route=>route.fulfill({json:{status:'ok',calculationApiAvailable:false,storageConfigured:false}}));
+ await page.route('**/api/calculate',route=>{calls++;return route.fulfill({status:503,json:{error:'Protected API unavailable'}})});
+ await page.reload();await expect(page.locator('#cloudStatus')).toContainText('Free standard mode');
+ await page.evaluate(()=>taxEngineReady);await page.locator('#wages').fill('100000');await submit(page);
+ await expect(page.locator('#estimatedTax')).toContainText('13,170');expect(calls).toBe(0);
+});
+
+test('RRSP claims and planner require confirmed CRA room',async({page})=>{
+ await page.locator('#country').selectOption('ca');await page.locator('#subRegion').selectOption('ON');await page.locator('#wages').fill('100000');
+ await page.locator('#rrspContrib').fill('1000');await submit(page);await expect(page.locator('#errorBox')).toContainText('RRSP deduction limit');
+ await page.locator('#rrspDeductionLimit').fill('999');await submit(page);await expect(page.locator('#errorBox')).toContainText('cannot exceed');
+ await page.locator('#rrspDeductionLimit').fill('2000');await submit(page);await expect(page.locator('#errorBox')).toContainText('Confirm');
+ await page.locator('#rrspClaimConfirmed').check();await submit(page);await expect(page.locator('#resultsPanel')).toBeVisible();
+ await page.locator('#rrspWhatIf').fill('1001');await expect(page.locator('#rrspSavings')).toHaveText('Not calculated');await expect(page.locator('#rrspPlannerMessage')).toContainText('cannot exceed');
+ await page.locator('#rrspWhatIf').fill('1000');await expect(page.locator('#rrspSavings')).not.toHaveText('Not calculated');
+ await expect(page.locator('#modelAssumptions')).toContainText('Full-year resident');await expect(page.locator('#modelLimitations')).toContainText('incomplete');
+});
+
+test('unsupported donation controls and high self-employment scope are explicit',async({page})=>{
+ await page.locator('#standardDeduction').uncheck();await expect(page.locator('#charitableDonations')).toBeDisabled();await expect(page.locator('#donationHelp')).toContainText('not yet modeled');
+ await page.locator('#selfEmployment').fill('300000');await submit(page);await expect(page.locator('#errorBox')).toContainText('Additional Medicare');await expect(page.locator('#resultsPanel')).toBeHidden();
+ await page.locator('#country').selectOption('ca');await expect(page.locator('#selfEmploymentHelp')).toContainText('unavailable');await submit(page);await expect(page.locator('#errorBox')).toContainText('self-employment');
 });

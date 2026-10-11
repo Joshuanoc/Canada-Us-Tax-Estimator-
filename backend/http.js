@@ -3,7 +3,9 @@ import {calculate,normalizeInput} from './tax.js';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 class HttpError extends Error{constructor(status,message){super(message);this.status=status;}}
 export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createRateLimiter({env})}={}){
+ const cloudEnabled=()=>env.TAXMETRIC_CLOUD_STORAGE_ENABLED==='true';
  const config=()=>{
+  if(!cloudEnabled())throw new HttpError(503,'Cloud saving is disabled. Scenarios can be saved in this browser.');
   if(!env.SUPABASE_URL||!env.SUPABASE_PUBLISHABLE_KEY)throw new HttpError(503,'Cloud saving is not configured.');
   const url=new URL(env.SUPABASE_URL);
   if(url.protocol!=='https:')throw new HttpError(503,'Storage requires HTTPS.');
@@ -15,6 +17,7 @@ export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createR
   if(!response.ok){if(response.status===401||response.status===403)throw new HttpError(401,'Guest session expired.');throw new HttpError(502,'Storage service could not complete the request.');}
   return data;
  }
+ const decodeCookie=value=>{try{return decodeURIComponent(value);}catch{throw new HttpError(400,'Invalid session cookie.');}};
  const cookies=req=>Object.fromEntries((req.headers.cookie||'').split(';').map(s=>s.trim().split('=')).filter(a=>a.length===2));
  function setSession(req,res,s){
   const secure=env.NODE_ENV==='production'||req.headers['x-forwarded-proto']==='https';
@@ -22,10 +25,10 @@ export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createR
   res.setHeader('Set-Cookie',[`taxmetric_access=${encodeURIComponent(s.access_token)}; Max-Age=${Math.min(s.expires_in||3600,3600)}; ${attrs}`,`taxmetric_refresh=${encodeURIComponent(s.refresh_token)}; Max-Age=2592000; ${attrs}`]);
  }
  async function guest(req,res,create=false){
-  const stored=cookies(req);let token=stored.taxmetric_access?decodeURIComponent(stored.taxmetric_access):null;
+  const stored=cookies(req);let token=stored.taxmetric_access?decodeCookie(stored.taxmetric_access):null;
   if(token){try{const user=await provider('/auth/v1/user',{token});return {token,user};}catch(e){if(e.status!==401)throw e;}}
   let session;
-  if(stored.taxmetric_refresh){try{session=await provider('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:decodeURIComponent(stored.taxmetric_refresh)}});}catch(e){if(e.status!==401)throw e;throw new HttpError(401,'Guest session expired. Clear this site’s cookies to start a new session.');}}
+  if(stored.taxmetric_refresh){try{session=await provider('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:decodeCookie(stored.taxmetric_refresh)}});}catch(e){if(e.status!==401)throw e;throw new HttpError(401,'Guest session expired. Clear this site’s cookies to start a new session.');}}
   else if(create)session=await provider('/auth/v1/signup',{method:'POST',body:{data:{}}});
   else return null;
   if(!session?.access_token||!session?.refresh_token||!UUID.test(session.user?.id||''))throw new HttpError(502,'Guest session could not be established.');
@@ -44,20 +47,27 @@ export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createR
    // Browser mutations must originate on this host; no permissive cross-origin credential access.
    if(!['GET','HEAD'].includes(req.method)){
     const origin=req.headers.origin;
-    if(origin){const host=req.headers['x-forwarded-host']||req.headers.host;if(new URL(origin).host!==host)throw new HttpError(403,'Cross-origin requests are not permitted.');}
+    if(origin){const host=req.headers['x-forwarded-host']||req.headers.host;let parsed;try{parsed=new URL(origin);}catch{throw new HttpError(403,'Invalid request origin.');}if(!['http:','https:'].includes(parsed.protocol)||parsed.host!==host)throw new HttpError(403,'Cross-origin requests are not permitted.');}
     if(req.headers['sec-fetch-site']==='cross-site')throw new HttpError(403,'Cross-site requests are not permitted.');
    }
    const url=new URL(req.url,'http://localhost'),path=url.pathname;
-   if(path==='/api/health'&&req.method==='GET')return send(200,{status:'ok',storageConfigured:Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v1'});
+   if(path==='/api/health'&&req.method==='GET'){
+    const production=env.NODE_ENV==='production'||env.VERCEL==='1';
+    let protectionConfigured=false;
+    try{const endpoint=new URL(env.UPSTASH_REDIS_REST_URL);protectionConfigured=endpoint.protocol==='https:'&&!endpoint.username&&!endpoint.password&&Boolean(env.UPSTASH_REDIS_REST_TOKEN)&&typeof env.RATE_LIMIT_SECRET==='string'&&env.RATE_LIMIT_SECRET.length>=32;}catch{}
+    const calculationApiAvailable=!production||protectionConfigured;
+    return send(200,{status:'ok',calculationApiAvailable,storageConfigured:cloudEnabled()&&calculationApiAvailable&&Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v1'});
+   }
    if(path==='/api/calculate'&&req.method==='POST'){
     await rateLimit(req,'calculate',60,60);
     const input=await body(req);let result;try{result=calculate(input);}catch(e){throw new HttpError(400,e.message);}return send(200,{result});
    }
    if(path==='/api/scenarios'){
+    config();
     await rateLimit(req,'scenarios',60,60);
     if(req.method==='POST')await rateLimit(req,'save-ip',20,3600);
     if(req.method==='POST'){
-     const raw=await body(req);let input,result;try{input=normalizeInput(raw.input);result=calculate(input);}catch(e){throw new HttpError(400,e.message);}
+     const raw=await body(req);if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new HttpError(400,'Scenario must be a JSON object.');let input,result;try{input=normalizeInput(raw.input);result=calculate(input);}catch(e){throw new HttpError(400,e.message);}
      if(raw.name!==undefined&&(typeof raw.name!=='string'||raw.name.length>100))throw new HttpError(400,'Scenario name must be at most 100 characters.');
      const session=await guest(req,res,true);
      await rateLimit(req,'save-owner',100,86400,session.user.id);

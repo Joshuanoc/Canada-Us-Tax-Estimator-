@@ -2,7 +2,8 @@ import test from 'node:test';import assert from 'node:assert/strict';import fs f
 test('PostgreSQL row policies isolate guest scenarios and deny anonymous access',async()=>{
  const db=new PGlite();try{
  await db.exec(`create role anon;create role authenticated;create schema auth;create table auth.users(id uuid primary key);create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;`);
- const sql=await fs.readFile(new URL('../../database/001_scenarios.sql',import.meta.url),'utf8');await db.exec(sql);await db.exec(sql);
+ const sql=await fs.readFile(new URL('../../database/001_scenarios.sql',import.meta.url),'utf8');await db.exec(sql);await db.exec('grant update, truncate, references, trigger on public.scenarios to authenticated');await db.exec(sql);
+ for(const privilege of ['UPDATE','TRUNCATE','REFERENCES','TRIGGER']){const check=await db.query("select has_table_privilege('authenticated','public.scenarios',$1) as allowed",[privilege]);assert.equal(check.rows[0].allowed,false,privilege+' must be revoked');}
  const a='11111111-1111-4111-8111-111111111111',b='22222222-2222-4222-8222-222222222222';
  await db.query('insert into auth.users(id) values ($1),($2)',[a,b]);await db.exec('set role authenticated');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[a]);
  await db.query("insert into public.scenarios(owner_id,name,input,result) values ($1,'A','{}','{}')",[a]);
