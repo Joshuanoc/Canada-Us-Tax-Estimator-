@@ -3,4 +3,6 @@ import { mkdir, copyFile } from 'node:fs/promises';
 await mkdir('dist', { recursive: true });
 await copyFile('index.html', 'dist/index.html');
 await copyFile('cloud.js', 'dist/cloud.js');
+await copyFile('app.js', 'dist/app.js');
 console.log('Frontend packaged in dist; Vercel discovers api functions separately.');
+
