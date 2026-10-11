@@ -80,3 +80,7 @@ dependent standard-deduction rules, charitable restrictions and AMT remain omitt
 ## Marginal-rate consistency
 
 The displayed modeled marginal income-tax rate measures tax on the next cent of ordinary income, with employment/payroll facts held fixed. It includes modeled credit phase-outs, Ontario surtax/premiums and US itemized deduction changes, and excludes payroll and unmodeled rules. Ontario employment at 100,000 gives 31.48%, consistent with the RRSP comparison; an itemized US case at 510,000 with 50,000 property tax gives 45.50% during the SALT phase-down. Rates at thresholds describe the next-cent interval.
+
+## Business result semantics
+
+After-tax business profit is revenue minus entered costs and modeled corporate income tax, with losses preserved. Pass-through profit is explicitly before unmodeled owner taxes. Depreciation and inventory calculations are accounting inputs, so monthly profit is not claimed as liquid cash flow. Personal modeled income after tax does not subtract retirement saving contributions.

@@ -14,7 +14,7 @@ The free standard estimator has a reviewed merge candidate with production-safet
 
 ## Verification
 
-Latest local suite: **134 unit/API tests passed, 0 failed**; build passed. **104 desktop/mobile Playwright cases** include calculation, screening, RRSP room, unsupported-input, CSP/XSS and free-mode checks. Release evidence tests attach desktop/mobile result and questionnaire screenshots with synthetic inputs. Exact-commit CI, artifacts and review status are linked from PR https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/pull/9.
+Latest local suite: **135 unit/API tests passed, 0 failed**; build passed. **104 desktop/mobile Playwright cases** include calculation, screening, RRSP room, unsupported-input, CSP/XSS and free-mode checks. Release evidence tests attach desktop/mobile result and questionnaire screenshots with synthetic inputs. Panel screenshots were visually reviewed; the mobile ring and sticky-header clearance defects found in that review are fixed, with a square-ring browser assertion. Business after-tax profit now subtracts costs before tax and preserves losses. Personal income labels explain that retirement contributions are not subtracted from displayed after-tax income. Exact-commit CI, artifacts and review status are linked from PR https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/pull/9.
 
 Earlier integrated commit bcd78b5e7e551ce1dbcf577310a7b35a39e3bf57 passed 130 unit tests and 98 desktop/mobile browser tests plus dependency audit, tracked-file scan, full-history Gitleaks and build in https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/actions/runs/38178324393. Later changes require their own checks; earlier evidence is not reused as a current passing result.
 
