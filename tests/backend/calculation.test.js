@@ -9,6 +9,7 @@ test('calculation is deterministic and explicitly versioned', () => {
   assert.throws(() => calculate({ taxYear: 2025 }), /tax year/);
 });
 test('US self-employment tax is separated from federal ordinary income tax', () => {
+  assert.throws(() => calculate({ wages: 50000, selfEmployment: 50000 }), /coordination/);
   const r = calculate({ selfEmployment: 100000 });
   const se = 100000 * .9235 * (.124 + .029);
   assert.equal(r.payroll, Math.round(se * 100) / 100);
