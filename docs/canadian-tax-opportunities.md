@@ -1,6 +1,6 @@
 # Canadian opportunity source audit
 
-Reviewed 2026-10-11. Target tax year: 2026. All 35 catalog entries have a category, general screening conditions, required evidence, limits, provincial scope and official CRA source links. This is a general-condition audit, not completed verification of 2026 filing rules or every provincial program. All catalog calculations remain disabled.
+Reviewed 2026-10-11. Target tax year: 2026. All 35 catalog entries have a category, general screening conditions, required evidence, limits, provincial scope and official CRA source links. This is a general-condition audit, not completed verification of 2026 filing rules or every provincial program. Automatic catalog application remains disabled. The engine separately supports two limited calculations: the 2026 Canada employment amount and an explicitly confirmed qualifying employment-dues deduction. Screening does not apply either amount again.
 
 ## Findings and release limits
 
@@ -9,7 +9,7 @@ Reviewed 2026-10-11. Target tax year: 2026. All 35 catalog entries have a catego
 - Professional licensing fees are not a universal employee deduction: CRA excludes licences from line 21200; annual self-employed business licences can qualify separately.
 - Provincial child benefits and refundable provincial credits are umbrella categories. A named program and jurisdiction must be selected before eligibility can be established.
 - CCB/CGEB are separate payments, not tax-return refunds. Pension splitting and HBP are planning programs, not standalone extra credits.
-- No entry is calculation-enabled merely because it has a source. 2026 indexed limits, rates, enacted changes, province-specific schedules and interactions remain release gates.
+- No entry is automatically calculation-enabled merely because it has a source. `calculationSupport` documents limited existing engine support for CEA and confirmed dues; the remaining 33 entries need year-specific verification and tested implementation. Provincial schedules and special filing interactions remain release gates.
 - The guided workflow may show potentially eligible from self-reported applicability, ineligible from an explicit user exclusion, and insufficient information for unknown answers. It must not certify legal eligibility from broad life-situation answers.
 
 ## Questionnaire decision scope
@@ -21,13 +21,17 @@ The catalog contains 70 item-specific questions. A negative answer excludes an o
 ### Canada Employment Amount
 
 **Classification:** non refundable credit  
-**2026 verification:** 2026 amounts unverified; calculation disabled.
+**2026 verification:** CEA ceiling and rate verified in CRA T4127 Table 8.2 and K4 formula; limited Canadian employment-model calculation implemented. Broader eligibility is not certified.
 
 **Screening conditions:** Employment income reported on line 10100 or 10400; self-employment income alone does not qualify.
 
 **Required information:** Employment slips; employment income; tax residency dates.
 
-**Limits and interactions:** Claim base is limited to employment income and an indexed annual ceiling. The CRA page reviewed is for 2025, not a verified 2026 ceiling.
+**Limits and interactions:** CRA T4127 verifies the 2026 claim base ceiling of $1,501 and 14% federal rate. The engine credits 14% of min(wages, $1,501), with a non-refundable federal tax floor. Special filing cases remain outside the limited model.
+
+**Calculation support:** `wages`; automatic inclusion in supported Canadian employment estimates only, with no duplicate questionnaire application.
+
+**2026 amount source:** [CRA T4127 Table 8.2 and K4 formula](https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t4127-payroll-deductions-formulas/t4127-jan/t4127-jan-payroll-deductions-formulas-computer-programs.html).
 
 **Provincial differences:** Federal opportunity; any separate provincial counterpart requires province-specific review. Quebec administers its own provincial return.
 
@@ -38,7 +42,7 @@ The catalog contains 70 item-specific questions. A negative answer excludes an o
 ### Union and professional dues
 
 **Classification:** deduction  
-**2026 verification:** 2026 amounts unverified; calculation disabled.
+**Verification:** General non-indexed CRA line 21200 rule reviewed; limited confirmed-input calculation implemented. No fixed indexed annual ceiling applies.
 
 **Screening conditions:** Qualifying annual union dues or legally recognized professional membership dues paid for employment; employer-paid dues must be included in income.
 
@@ -47,6 +51,8 @@ The catalog contains 70 item-specific questions. A negative answer excludes an o
 **Limits and interactions:** Initiation fees, licences and special assessments are excluded from annual dues; do not duplicate a T4 amount and receipt.
 
 **Provincial differences:** Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.
+
+**Calculation support:** `eligibleEmploymentDues` plus `employmentDuesConfirmed: true` in Canadian personal mode. Combined dues deducted once and exposed as `appliedDeductions.employmentDues`. Attestation does not verify receipts or eligibility; questionnaire responses do not supply amounts.
 
 **Official sources:**
 

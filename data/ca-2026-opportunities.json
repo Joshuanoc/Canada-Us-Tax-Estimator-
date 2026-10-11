@@ -20,20 +20,24 @@
         "tax residency dates"
       ],
       "limits": [
-        "Claim base is limited to employment income and an indexed annual ceiling. The CRA page reviewed is for 2025, not a verified 2026 ceiling."
+        "CRA T4127 verifies the 2026 claim base ceiling of $1,501 and 14% federal credit rate. Engine applies 14% of the lesser of wages and $1,501, subject to the non-refundable federal tax floor. Residency, deceased taxpayer and special filing cases are outside this limited model."
       ],
       "provincialDifferences": "Federal opportunity; any separate provincial counterpart requires province-specific review. Quebec administers its own provincial return.",
       "sources": [
         {
           "title": "Line 31260 \u2013 Canada employment amount",
           "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-31260-canada-employment-amount.html"
+        },
+        {
+          "title": "CRA T4127 January 2026, Table 8.2 and K4 formula",
+          "url": "https://www.canada.ca/en/revenue-agency/services/forms-publications/payroll/t4127-payroll-deductions-formulas/t4127-jan/t4127-jan-payroll-deductions-formulas-computer-programs.html"
         }
       ],
       "review": {
         "reviewedOn": "2026-10-11",
-        "scope": "general_conditions_only",
-        "taxYearStatus": "2026_amounts_unverified",
-        "sourceTaxYear": 2025
+        "scope": "2026_ceiling_and_rate_verified_general_conditions_screened",
+        "taxYearStatus": "2026_amount_and_rate_verified_limited_model",
+        "sourceTaxYear": 2026
       },
       "screeningQuestions": [
         {
@@ -47,7 +51,16 @@
           "necessary": false
         }
       ],
-      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
+      "screeningScope": "2026 amount and rate verified; broader eligibility and special filing circumstances are not certified by screening.",
+      "calculationSupport": {
+        "implemented": true,
+        "taxYear": 2026,
+        "inputFields": [
+          "wages"
+        ],
+        "application": "Automatically included in supported Canadian personal employment model; questionnaire answers do not apply a second credit.",
+        "eligibilityCertified": false
+      }
     },
     {
       "id": "union-and-professional-dues",
@@ -67,7 +80,7 @@
         "employer reimbursements"
       ],
       "limits": [
-        "Initiation fees, licences and special assessments are excluded from annual dues; do not duplicate a T4 amount and receipt."
+        "CRA line 21200 is a qualifying-expense deduction without a fixed indexed annual ceiling. Exclude initiation fees, licences, special assessments and pension dues; count combined eligible union/professional dues only once. User attestation does not verify receipts or legal eligibility."
       ],
       "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
       "sources": [
@@ -78,9 +91,9 @@
       ],
       "review": {
         "reviewedOn": "2026-10-11",
-        "scope": "general_conditions_only",
-        "taxYearStatus": "2026_amounts_unverified",
-        "sourceTaxYear": 2025
+        "scope": "line_21200_general_rule_and_confirmed_input_calculation",
+        "taxYearStatus": "non_indexed_rule_verified_limited_model",
+        "sourceTaxYear": null
       },
       "screeningQuestions": [
         {
@@ -94,7 +107,17 @@
           "necessary": false
         }
       ],
-      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
+      "screeningScope": "General non-indexed rule reviewed; explicitly confirmed expense input is supported, while documentation and legal eligibility remain user responsibility.",
+      "calculationSupport": {
+        "implemented": true,
+        "taxYear": 2026,
+        "inputFields": [
+          "eligibleEmploymentDues",
+          "employmentDuesConfirmed"
+        ],
+        "application": "Canadian personal mode requires explicit confirmation for any positive amount; result.appliedDeductions.employmentDues reports the combined deduction. Questionnaire responses do not transfer amounts.",
+        "eligibilityCertified": false
+      }
     },
     {
       "id": "professional-licensing-fees",
@@ -1747,6 +1770,6 @@
   ],
   "schemaVersion": 2,
   "reviewedOn": "2026-10-11",
-  "verificationStatus": "general_conditions_reviewed_2026_amounts_unverified",
-  "calculationPolicy": "Screening catalog never changes tax totals. A source update date is not its tax year. Annual amounts require tax-year-specific verification and tested implementation."
+  "verificationStatus": "general_conditions_reviewed_two_limited_calculations_supported_other_annual_amounts_unverified",
+  "calculationPolicy": "Catalog screening never applies amounts to tax totals. Explicit calculationSupport identifies limited existing engine support; calculationEnabled remains false for automatic catalog application. A source update date is not its tax year."
 }
