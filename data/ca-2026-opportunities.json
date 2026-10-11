@@ -7,281 +7,1746 @@
       "id": "canada-employment-amount",
       "name": "Canada Employment Amount",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Employment income reported on line 10100 or 10400",
+        "self-employment income alone does not qualify."
+      ],
+      "requiredInformation": [
+        "Employment slips",
+        "employment income",
+        "tax residency dates"
+      ],
+      "limits": [
+        "Claim base is limited to employment income and an indexed annual ceiling. The CRA page reviewed is for 2025, not a verified 2026 ceiling."
+      ],
+      "provincialDifferences": "Federal opportunity; any separate provincial counterpart requires province-specific review. Quebec administers its own provincial return.",
+      "sources": [
+        {
+          "title": "Line 31260 \u2013 Canada employment amount",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-31260-canada-employment-amount.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "canada-employment-amount-1",
+          "prompt": "Did you report employment income on line 10100 or 10400 (self-employment alone does not qualify)?",
+          "necessary": true
+        },
+        {
+          "id": "canada-employment-amount-2",
+          "prompt": "Do you know your tax residency dates and the employment income amount?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "union-and-professional-dues",
       "name": "Union and professional dues",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Qualifying annual union dues or legally recognized professional membership dues paid for employment",
+        "employer-paid dues must be included in income."
+      ],
+      "requiredInformation": [
+        "T4 box 44",
+        "receipts",
+        "professional membership requirements",
+        "employer reimbursements"
+      ],
+      "limits": [
+        "Initiation fees, licences and special assessments are excluded from annual dues; do not duplicate a T4 amount and receipt."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Annual union, professional or like dues",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-21200-annual-union-professional-like-dues.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "union-and-professional-dues-1",
+          "prompt": "Did you pay annual union dues or professional membership dues qualifying under CRA line 21200?",
+          "necessary": true
+        },
+        {
+          "id": "union-and-professional-dues-2",
+          "prompt": "Have you excluded initiation fees, licences and duplicate T4/receipt amounts?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "professional-licensing-fees",
       "name": "Professional licensing fees",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Not a standalone universal employee deduction: employee licences are excluded from line 21200",
+        "self-employed annual business licence fees may qualify as business expenses."
+      ],
+      "requiredInformation": [
+        "Employee or self-employed status",
+        "licence type",
+        "legal requirement",
+        "receipts",
+        "business purpose"
+      ],
+      "limits": [
+        "Do not combine licences with qualifying annual professional membership dues or count the same expense twice. Employee licensing eligibility remains unresolved."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Annual union, professional or like dues",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-21200-annual-union-professional-like-dues.html"
+        },
+        {
+          "title": "Business expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "employee_claim_not_established",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "professional-licensing-fees-1",
+          "prompt": "Were these annual licence fees incurred to run your own business?",
+          "necessary": false
+        },
+        {
+          "id": "professional-licensing-fees-2",
+          "prompt": "Have you confirmed the fees are business expenses rather than excluded employee licences?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "canada-training-credit",
       "name": "Canada Training Credit",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Canadian resident throughout the year",
+        "age 26 through 65 at year end",
+        "positive training credit limit",
+        "qualifying tuition or examination fees",
+        "file a return."
+      ],
+      "requiredInformation": [
+        "Date of birth",
+        "residency dates",
+        "latest CRA training credit limit",
+        "tuition certificate",
+        "qualifying fees"
+      ],
+      "limits": [
+        "Reviewed CRA rule: lesser of available training credit limit and 50% of qualifying fees; annual accrual conditions and 2026 forms need review."
+      ],
+      "provincialDifferences": "Federal opportunity; any separate provincial counterpart requires province-specific review. Quebec administers its own provincial return.",
+      "sources": [
+        {
+          "title": "Canada training credit : Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-45350-canada-training-credit.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "canada-training-credit-1",
+          "prompt": "Were you a Canadian resident throughout the year and aged 26 to 65 at year end?",
+          "necessary": true
+        },
+        {
+          "id": "canada-training-credit-2",
+          "prompt": "Is your CRA training credit limit positive, and did you pay eligible Canadian tuition or examination fees?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "student-loan-interest",
       "name": "Student loan interest",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Borrower legally responsible for a qualifying government student or apprentice loan",
+        "interest actually paid and not already claimed."
+      ],
+      "requiredInformation": [
+        "Loan legislation and lender",
+        "interest statement",
+        "payment years",
+        "unused carryforwards"
+      ],
+      "limits": [
+        "Current year or preceding five years; private, consolidated and renegotiated loans do not qualify; oldest unused interest first. No duplicate claim."
+      ],
+      "provincialDifferences": "Provincial student-loan credits may apply; Quebec has separate rules and forms.",
+      "sources": [
+        {
+          "title": "Line 31900 \u2013 Interest paid on your student loans",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-31900-interest-paid-on-your-student-loans.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "student-loan-interest-1",
+          "prompt": "Are you the legally responsible borrower on a qualifying government student or apprentice loan?",
+          "necessary": true
+        },
+        {
+          "id": "student-loan-interest-2",
+          "prompt": "Did you pay unclaimed interest within the current year or preceding five years, without reconsolidating the loan?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "tuition-credits",
       "name": "Tuition credits",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Eligible tuition supported by an institution certificate or official tax receipt",
+        "institution and course must meet CRA requirements."
+      ],
+      "requiredInformation": [
+        "T2202 or applicable TL11 certificate",
+        "eligible fees",
+        "carried-forward balance",
+        "training credit claim"
+      ],
+      "limits": [
+        "Federal education and textbook credits ended in 2017. Tuition transfer, carryforward and training-credit interactions require Schedule 11 review."
+      ],
+      "provincialDifferences": "Current provincial tuition eligibility and retained carryforwards vary by province; never assume all provinces provide a current credit.",
+      "sources": [
+        {
+          "title": "Line 32300 \u2013 Your federal tuition amount",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-32300-your-tuition-education-textbook-amounts.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "tuition-credits-1",
+          "prompt": "Do you have eligible tuition fees supported by an institution tax certificate or receipt?",
+          "necessary": true
+        },
+        {
+          "id": "tuition-credits-2",
+          "prompt": "Have you checked institutional/course eligibility, unused balances, and Canada training credit interactions?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "employment-expenses",
       "name": "Employment expenses",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Employment expense category must qualify",
+        "contract generally requires employee to pay costs",
+        "exclude personal commuting and reimbursed expenses unless applicable reimbursement is taxable."
+      ],
+      "requiredInformation": [
+        "Employment type",
+        "employer requirements",
+        "T2200 where required",
+        "T777",
+        "receipts",
+        "reimbursements"
+      ],
+      "limits": [
+        "Not every employment expense is deductible. Category-specific vehicle, home-office, tools and legal-fee exceptions require further review."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Line 22900 \u2013 Other employment expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-22900-other-employment-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "employment-expenses-1",
+          "prompt": "Did you pay expenses in a CRA-eligible employment expense category to earn employment income?",
+          "necessary": true
+        },
+        {
+          "id": "employment-expenses-2",
+          "prompt": "Have you checked employer requirements, applicable T2200 requirements and reimbursements for that expense category?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "moving-expenses",
       "name": "Moving expenses",
       "group": "employment",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Move for qualifying work or business, or eligible full-time studies",
+        "new home must be at least 40 kilometres closer to the new work or school location by the shortest public route."
+      ],
+      "requiredInformation": [
+        "Old and new addresses",
+        "route distances",
+        "move date",
+        "new-location income",
+        "receipts",
+        "reimbursement",
+        "student status"
+      ],
+      "limits": [
+        "Deduction restricted to qualifying income at the new location; reimbursements reduce claim. Student deduction applies to eligible taxable scholarship and similar income; unused amounts may carry forward."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Moving expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-21900-moving-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "moving-expenses-1",
+          "prompt": "Did you move for work/business or eligible full-time studies, and is the new home at least 40 kilometres closer by the shortest public route?",
+          "necessary": true
+        },
+        {
+          "id": "moving-expenses-2",
+          "prompt": "Do you have eligible income at the new location, receipts and reimbursement details?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "spouse-or-common-law-partner-amount",
       "name": "Spouse or common-law partner amount",
       "group": "family",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Financially supported a spouse or common-law partner",
+        "partner net income below the applicable amount",
+        "special separation and non-resident conditions apply."
+      ],
+      "requiredInformation": [
+        "Marital dates",
+        "support evidence",
+        "partner net world income in CAD",
+        "residency",
+        "infirmity"
+      ],
+      "limits": [
+        "Only one spouse may claim for the year; income reduces claim; support-payment interaction and annual indexed thresholds require review."
+      ],
+      "provincialDifferences": "Provincial spouse amounts differ; Quebec return separately reviewed.",
+      "sources": [
+        {
+          "title": "Spouse or common-law partner amount - Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30300-spouse-common-law-partner-amount.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "spouse-or-common-law-partner-amount-1",
+          "prompt": "Did you financially support your spouse or common-law partner during the year?",
+          "necessary": true
+        },
+        {
+          "id": "spouse-or-common-law-partner-amount-2",
+          "prompt": "Do you know their net income (world income in CAD if non-resident) and your separation/support-payment circumstances?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "childcare-expenses",
       "name": "Childcare expenses",
       "group": "family",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Child care paid to allow qualifying work, business, research or study",
+        "eligible child and provider",
+        "generally lower-income supporting person claims, with specified exceptions."
+      ],
+      "requiredInformation": [
+        "Child ages",
+        "provider receipts and identifier",
+        "both partners incomes",
+        "purpose",
+        "weeks",
+        "disability",
+        "reimbursements"
+      ],
+      "limits": [
+        "Age/disability annual caps, earned-income limits and higher-income-claimant exceptions require T778; no unverified 2026 limit used."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Child care expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-21400-child-care-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "childcare-expenses-1",
+          "prompt": "Did you pay eligible child care to allow qualifying work, business, research or study?",
+          "necessary": true
+        },
+        {
+          "id": "childcare-expenses-2",
+          "prompt": "Have you identified the eligible claimant, child age/disability, receipts and both partners earned incomes?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "eligible-dependant-amount",
       "name": "Eligible dependant amount",
       "group": "family",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Single, separated, divorced or widowed at a qualifying time",
+        "maintained a home and supported an eligible relative living there",
+        "relationship and age or impairment conditions apply."
+      ],
+      "requiredInformation": [
+        "Marital status",
+        "dependant relationship, age and net income",
+        "home support",
+        "shared custody",
+        "support obligations",
+        "competing claims"
+      ],
+      "limits": [
+        "One claim per household; no duplicate claimant; spouse and support-payment restrictions apply; annual income thresholds require review."
+      ],
+      "provincialDifferences": "Provincial eligible-dependant amounts vary; Quebec rules separate.",
+      "sources": [
+        {
+          "title": "Amount for an eligible dependant - Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30400-amount-eligible-dependant.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "eligible-dependant-amount-1",
+          "prompt": "At a qualifying time were you single, separated, divorced or widowed, maintaining a home with an eligible dependant you supported?",
+          "necessary": true
+        },
+        {
+          "id": "eligible-dependant-amount-2",
+          "prompt": "Have you checked relationship, age/impairment, income, competing claimant and child-support restrictions?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "caregiver-credits",
       "name": "Caregiver credits",
       "group": "family",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Supported a qualifying relative dependent because of a mental or physical infirmity",
+        "age and relationship determine which caregiver amount applies."
+      ],
+      "requiredInformation": [
+        "Relationship",
+        "dependant age and net income",
+        "support evidence",
+        "medical statement or DTC approval when applicable"
+      ],
+      "limits": [
+        "Separate rules for children under 18, spouses and adult relatives; coordinate Schedule 5 claims and avoid double counting. Indexed 2026 amounts unverified."
+      ],
+      "provincialDifferences": "Provincial caregiver counterparts and thresholds vary; Quebec separate.",
+      "sources": [
+        {
+          "title": "Canada caregiver amount for spouse or common-law partner, or eligible dependant age 18 or older - Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30425-caregiver-spouse-dependant.html"
+        },
+        {
+          "title": "Canada caregiver amount for other infirm dependants age 18 or older - Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30450-caregiver-infirm-dependant.html"
+        },
+        {
+          "title": "Canada caregiver amount for infirm children under 18 years of age - Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-30499-30500-canada-caregiver-infirm-children-under-18-years.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "caregiver-credits-1",
+          "prompt": "Did you support a qualifying relative dependent on you because of mental or physical infirmity?",
+          "necessary": true
+        },
+        {
+          "id": "caregiver-credits-2",
+          "prompt": "Do you know their age, relationship, net income and medical evidence needed for the applicable caregiver amount?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "canada-child-benefit",
       "name": "Canada Child Benefit",
       "group": "family",
-      "classification": "separate_benefit_or_program",
+      "classification": "government_benefit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Live with a child under 18 and be primarily responsible for care",
+        "Canadian tax residency and qualifying status of applicant or spouse required",
+        "foster-child exclusions apply."
+      ],
+      "requiredInformation": [
+        "Child age",
+        "custody percentage",
+        "primary caregiver",
+        "residency",
+        "immigration status",
+        "both partners prior-year incomes"
+      ],
+      "limits": [
+        "Payment period July to June uses prior-year adjusted family net income; shared custody affects amount. This is a separate monthly benefit, not an income-tax refund."
+      ],
+      "provincialDifferences": "CRA may combine related provincial child benefits; program eligibility and amounts vary.",
+      "sources": [
+        {
+          "title": "CCB eligibility",
+          "url": "https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/who-apply.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "canada-child-benefit-1",
+          "prompt": "Do you live with a child under 18 and have primary caregiving responsibility or qualifying shared custody?",
+          "necessary": true
+        },
+        {
+          "id": "canada-child-benefit-2",
+          "prompt": "Have you confirmed Canadian tax residency, qualifying status and foster-child exclusions, plus both partners income?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "provincial-child-benefits",
       "name": "Provincial child benefits",
       "group": "family",
-      "classification": "separate_benefit_or_program",
+      "classification": "government_benefit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Eligibility must be checked for the named provincial or territorial program",
+        "residence, children and family income commonly relevant."
+      ],
+      "requiredInformation": [
+        "Province",
+        "named program",
+        "child ages",
+        "family income",
+        "custody",
+        "residency dates"
+      ],
+      "limits": [
+        "Umbrella category, not one claim. No eligibility or amount established until a specific program and payment period are selected."
+      ],
+      "provincialDifferences": "Availability, income thresholds, administration and payment schedules differ by province; Quebec benefits require separate authority.",
+      "sources": [
+        {
+          "title": "Provincial and territorial programs",
+          "url": "https://www.canada.ca/en/revenue-agency/services/child-family-benefits/provincial-territorial-programs.html"
+        },
+        {
+          "title": "CCB eligibility",
+          "url": "https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit/who-apply.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "program_selection_required",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "provincial-child-benefits-1",
+          "prompt": "Have you selected a named provincial or territorial child benefit for your residence?",
+          "necessary": false
+        },
+        {
+          "id": "provincial-child-benefits-2",
+          "prompt": "Have you checked that programs own eligibility and payment-period rules?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "rrsp-contributions",
       "name": "RRSP contributions",
       "group": "home_retirement",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Eligible RRSP contributions with available CRA deduction limit",
+        "contribution receipt and timing must qualify",
+        "repayments designated to HBP or LLP are not deductible."
+      ],
+      "requiredInformation": [
+        "CRA deduction limit",
+        "unused contributions",
+        "receipts and dates",
+        "HBP/LLP repayment designations"
+      ],
+      "limits": [
+        "Use personal deduction limit, not only a national maximum. First-60-day timing and excess-contribution rules need review."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "RRSP deduction",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-20800-rrsp-deduction.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "rrsp-contributions-1",
+          "prompt": "Do you have eligible RRSP contributions and unused CRA deduction room?",
+          "necessary": true
+        },
+        {
+          "id": "rrsp-contributions-2",
+          "prompt": "Have you checked contribution dates, prior deductions and HBP/LLP repayment designations?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "fhsa-contributions",
       "name": "FHSA contributions",
       "group": "home_retirement",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Qualifying FHSA contributions within participation room",
+        "opening eligibility and account history verified",
+        "RRSP-to-FHSA transfers are not deductible."
+      ],
+      "requiredInformation": [
+        "Account opening date",
+        "first-home eligibility",
+        "CRA participation room",
+        "contributions",
+        "transfers",
+        "previous deductions"
+      ],
+      "limits": [
+        "Annual/lifetime participation limits, unused room and carryforward restrictions need verification before calculation. Deduct only permitted contributions."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "FHSA deduction",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-20805-fhsa-deduction.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "fhsa-contributions-1",
+          "prompt": "Did you contribute to a valid FHSA (rather than only transfer funds from an RRSP)?",
+          "necessary": true
+        },
+        {
+          "id": "fhsa-contributions-2",
+          "prompt": "Have you verified account eligibility, participation room and contributions not previously deducted?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "home-buyers-amount",
       "name": "Home Buyers' Amount",
       "group": "home_retirement",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Acquired qualifying Canadian home",
+        "first-time home ownership/occupancy test in current and prior four years, or qualifying disability exception",
+        "principal occupancy intended within one year."
+      ],
+      "requiredInformation": [
+        "Purchase date and registration",
+        "prior ownership and occupancy for both partners",
+        "disability status",
+        "intended occupancy"
+      ],
+      "limits": [
+        "Reviewed 2025 page permits a $10,000 claim base shared between eligible purchasers. This is not a $10,000 refund; 2026 amount/rate unverified."
+      ],
+      "provincialDifferences": "Federal opportunity; any separate provincial counterpart requires province-specific review. Quebec administers its own provincial return.",
+      "sources": [
+        {
+          "title": "Line 31270 \u2013 Home buyers' amount",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-31270-home-buyers-amount.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "home-buyers-amount-1",
+          "prompt": "Did you or your partner acquire a qualifying home in Canada?",
+          "necessary": true
+        },
+        {
+          "id": "home-buyers-amount-2",
+          "prompt": "Do you meet the first-time ownership/occupancy test OR the qualifying disability exception, and intend qualifying principal occupancy within one year?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "home-buyers-plan",
       "name": "Home Buyers' Plan",
       "group": "home_retirement",
-      "classification": "separate_benefit_or_program",
+      "classification": "planning_program",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Eligible RRSP withdrawal for buying/building qualifying home",
+        "written agreement, Canadian residency and first-time-buyer or applicable exception conditions apply."
+      ],
+      "requiredInformation": [
+        "Withdrawal dates",
+        "RRSP history",
+        "written purchase agreement",
+        "residence",
+        "prior ownership",
+        "outstanding HBP balance"
+      ],
+      "limits": [
+        "Withdrawals and subsequent repayments follow HBP rules; repayments are not a new deduction. Withdrawal and repayment-year limits must be reviewed for withdrawal date."
+      ],
+      "provincialDifferences": "Federal RRSP program; housing incentives provided by provinces are separate.",
+      "sources": [
+        {
+          "title": "HBP participation",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/rrsps-related-plans/what-home-buyers-plan/participate-home-buyers-plan.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "home-buyers-plan-1",
+          "prompt": "Are you considering an RRSP withdrawal under the HBP with a written agreement to buy or build a qualifying home?",
+          "necessary": true
+        },
+        {
+          "id": "home-buyers-plan-2",
+          "prompt": "Have you checked residence, first-time-buyer OR applicable exception, withdrawal timing and outstanding HBP balance?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "home-accessibility-expenses",
       "name": "Home accessibility expenses",
       "group": "home_retirement",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Qualifying individual aged 65 or older or DTC-eligible",
+        "qualifying enduring accessibility/safety renovation of eligible Canadian dwelling",
+        "eligible claimant relation/ownership conditions."
+      ],
+      "requiredInformation": [
+        "Age or DTC approval",
+        "ownership and occupants",
+        "renovation purpose",
+        "dated receipts",
+        "reimbursements",
+        "other claimants"
+      ],
+      "limits": [
+        "Reviewed 2025 limit is $20,000 eligible expenditure, shared limits apply; not a $20,000 refund. Verify 2026 amount/rate and interaction rules."
+      ],
+      "provincialDifferences": "Federal opportunity; any separate provincial counterpart requires province-specific review. Quebec administers its own provincial return.",
+      "sources": [
+        {
+          "title": "Home accessibility expenses \u2013 Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-31285-home-accessibility-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "home-accessibility-expenses-1",
+          "prompt": "Is the qualifying individual aged 65 or older OR eligible for the disability tax credit?",
+          "necessary": true
+        },
+        {
+          "id": "home-accessibility-expenses-2",
+          "prompt": "Did you incur an enduring accessibility or safety renovation of an eligible Canadian dwelling, and qualify as its claimant?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "multigenerational-home-renovation-tax-credit",
       "name": "Multigenerational Home Renovation Tax Credit",
       "group": "home_retirement",
-      "classification": "requires_rule_verification",
+      "classification": "refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Completed qualifying renovation creates self-contained secondary unit for senior or DTC-eligible adult to live with qualifying relative",
+        "eligible dwelling and claimant conditions apply."
+      ],
+      "requiredInformation": [
+        "Completion date",
+        "unit facilities",
+        "ownership",
+        "age or DTC approval",
+        "relative",
+        "residency",
+        "invoices",
+        "expense sharing"
+      ],
+      "limits": [
+        "Reviewed 2025 page: expenditure cap $50,000 with 14.5% credit. Do not reuse 2025 rate for 2026. Lifetime renovation restrictions and duplicate expenses require review."
+      ],
+      "provincialDifferences": "Federal opportunity; any separate provincial counterpart requires province-specific review. Quebec administers its own provincial return.",
+      "sources": [
+        {
+          "title": "Multigenerational home renovation tax credit (MHRTC) : Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-45355-mhrtc.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "multigenerational-home-renovation-tax-credit-1",
+          "prompt": "Did you complete a renovation creating a qualifying self-contained secondary unit for a senior OR DTC-eligible adult to live with a qualifying relative?",
+          "necessary": true
+        },
+        {
+          "id": "multigenerational-home-renovation-tax-credit-2",
+          "prompt": "Have you checked eligible dwelling/claimant rules, completion timing, invoices and any shared or duplicate claims?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "pension-income-amount",
       "name": "Pension income amount",
       "group": "home_retirement",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Reported a CRA-eligible pension, superannuation or annuity type",
+        "eligibility depends on age and source or survivor circumstances."
+      ],
+      "requiredInformation": [
+        "Age",
+        "T4A/T4RIF and other pension slips",
+        "income source",
+        "survivor status",
+        "elected split pension"
+      ],
+      "limits": [
+        "CPP/QPP and OAS are not qualifying pension income for this credit. Reviewed rule caps federal claim base at $2,000; 2026 filing treatment requires review."
+      ],
+      "provincialDifferences": "Provincial pension amounts and age conditions can differ; Quebec separate.",
+      "sources": [
+        {
+          "title": "Pension income amount - Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-31400-pension-income-amount.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "pension-income-amount-1",
+          "prompt": "Did you receive a pension type eligible under CRAs pension-income-amount chart (CPP/QPP and OAS alone do not qualify)?",
+          "necessary": true
+        },
+        {
+          "id": "pension-income-amount-2",
+          "prompt": "Have you checked the age and source/survivor requirements for that pension type?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "pension-income-splitting",
       "name": "Pension income splitting",
       "group": "home_retirement",
-      "classification": "requires_rule_verification",
+      "classification": "planning_program",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Spouses or common-law partners meet residence and relationship requirements",
+        "eligible pension type",
+        "joint annual election T1032."
+      ],
+      "requiredInformation": [
+        "Both partners ages and residence",
+        "relationship dates",
+        "eligible pension",
+        "related withholding",
+        "signed election"
+      ],
+      "limits": [
+        "Up to 50% eligible pension allocated; recipient reports income and donor deducts it. Withholding must be allocated in same proportion. CPP/QPP sharing is a separate program."
+      ],
+      "provincialDifferences": "May affect federal and provincial tax and individual-income benefits; Quebec provincial election rules require review.",
+      "sources": [
+        {
+          "title": "Pension income splitting",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/pension-income-splitting.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "pension-income-splitting-1",
+          "prompt": "Do you have a spouse or common-law partner and pension income eligible for pension splitting?",
+          "necessary": true
+        },
+        {
+          "id": "pension-income-splitting-2",
+          "prompt": "Do both partners meet residence/relationship requirements and agree to a T1032 election including proportionate withholding?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "disability-tax-credit",
       "name": "Disability Tax Credit",
       "group": "health_benefits",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "CRA-approved DTC covering the claimed year",
+        "medical practitioner certification and approval required, not diagnosis alone."
+      ],
+      "requiredInformation": [
+        "T2201",
+        "CRA approval years",
+        "age",
+        "attendant-care or childcare expenses",
+        "unused transfer claim"
+      ],
+      "limits": [
+        "Indexed base and under-18 supplement; attendant-care and other claims can restrict amounts; 2026 annual amounts unverified."
+      ],
+      "provincialDifferences": "Provincial disability amounts differ; Quebec separate approval and return requirements may apply.",
+      "sources": [
+        {
+          "title": "Line\u00a031600\u00a0\u2013 Disability amount for self",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-31600-disability-amount-self.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "disability-tax-credit-1",
+          "prompt": "Does your CRA DTC approval cover the year being claimed?",
+          "necessary": true
+        },
+        {
+          "id": "disability-tax-credit-2",
+          "prompt": "Have you checked any attendant-care, child-care or disability-transfer interactions?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "medical-expenses",
       "name": "Medical expenses",
       "group": "health_benefits",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Eligible expenses paid by taxpayer or partner for eligible persons in a 12-month period ending in tax year, not previously claimed",
+        "exclude reimbursement unless applicable taxable reimbursement exception."
+      ],
+      "requiredInformation": [
+        "Patient and relationship",
+        "dates",
+        "receipts",
+        "reimbursements",
+        "prescriptions or certification",
+        "net income"
+      ],
+      "limits": [
+        "Credit uses net-income and annual dollar thresholds; dependants have separate calculations. Verify allowed expense and practitioner by jurisdiction; 2026 thresholds unverified."
+      ],
+      "provincialDifferences": "Provincial credits/thresholds differ; authorized medical practitioners depend on jurisdiction.",
+      "sources": [
+        {
+          "title": "Lines 33099 and 33199 \u2013 Eligible medical expenses you can claim on your tax return",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/lines-33099-33199-eligible-medical-expenses-you-claim-on-your-tax-return.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "medical-expenses-1",
+          "prompt": "Did you or your partner pay an eligible medical expense for an eligible person within a 12-month period ending in the tax year?",
+          "necessary": true
+        },
+        {
+          "id": "medical-expenses-2",
+          "prompt": "Have you excluded prior claims and non-taxable reimbursements and kept required prescriptions/certification?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "gst-hst-credit",
-      "name": "GST/HST credit",
+      "name": "Canada Groceries and Essentials Benefit (formerly GST/HST credit)",
       "group": "health_benefits",
-      "classification": "separate_benefit_or_program",
+      "classification": "government_benefit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "GST/HST credit renamed CGEB from July 2026",
+        "low/modest-income residents meeting age or family circumstances",
+        "CRA determines entitlement from filed return."
+      ],
+      "requiredInformation": [
+        "Residency",
+        "age",
+        "family status",
+        "prior-year adjusted family net income",
+        "payment period",
+        "newcomer information"
+      ],
+      "limits": [
+        "Quarterly benefit separate from tax refund; July-to-June entitlement uses prior-year return. Legacy GST/HST payments ended April 2026; June 2026 top-up has distinct entitlement rules."
+      ],
+      "provincialDifferences": "Related provincial/territorial benefit payments may be combined; separate program criteria.",
+      "sources": [
+        {
+          "title": "GST/HST credit renamed July 2026",
+          "url": "https://www.canada.ca/en/revenue-agency/services/child-family-benefits/gst-hst-credit.html"
+        },
+        {
+          "title": "Canada Groceries and Essentials Benefit",
+          "url": "https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-groceries-essentials-benefit.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "gst-hst-credit-1",
+          "prompt": "Have you checked CGEB (formerly GST/HST credit) eligibility for the relevant quarterly payment period?",
+          "necessary": false
+        },
+        {
+          "id": "gst-hst-credit-2",
+          "prompt": "Do you know your residency, age/family circumstances and prior-year adjusted family net income?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "canada-workers-benefit",
       "name": "Canada Workers Benefit",
       "group": "health_benefits",
-      "classification": "requires_rule_verification",
+      "classification": "refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Working low-income Canadian resident throughout year",
+        "age 19 or older at year end or lives with spouse/partner or child",
+        "full-time-student and confinement exclusions apply."
+      ],
+      "requiredInformation": [
+        "Working income",
+        "adjusted net income for both partners",
+        "age",
+        "residency",
+        "study duration",
+        "dependant",
+        "disability",
+        "advances"
+      ],
+      "limits": [
+        "Basic and disability supplement amounts phase out; 2026 thresholds and advance reconciliation unverified. Do not add advance payments again as a refund."
+      ],
+      "provincialDifferences": "Calculation differs in certain provinces/territories; use applicable Schedule 6, including Quebec.",
+      "sources": [
+        {
+          "title": "Canada workers benefit (CWB)",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-45300-canada-workers-benefit-cwb.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "canada-workers-benefit-1",
+          "prompt": "Did you have working income and reside in Canada throughout the year?",
+          "necessary": true
+        },
+        {
+          "id": "canada-workers-benefit-2",
+          "prompt": "Have you checked age OR spouse/child exception, full-time-student/confinement exclusions, income limits and advance payments?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "refundable-provincial-credits",
       "name": "Refundable provincial credits",
       "group": "health_benefits",
-      "classification": "requires_rule_verification",
+      "classification": "refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Specific refundable provincial credit must be selected and tested against its local eligibility",
+        "residence and income alone do not establish eligibility."
+      ],
+      "requiredInformation": [
+        "Province",
+        "named credit",
+        "household income",
+        "rent/property taxes or other qualifying evidence",
+        "residence dates"
+      ],
+      "limits": [
+        "Umbrella category, not a single calculation. Province/year-specific amount and qualifying expenses remain unresolved."
+      ],
+      "provincialDifferences": "Each province/territory has different credit programs and schedules; Quebec administered separately.",
+      "sources": [
+        {
+          "title": "Provincial and territorial tax and credits for individuals",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/provincial-territorial-tax-credits-individuals.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "program_selection_required",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "refundable-provincial-credits-1",
+          "prompt": "Have you selected a named refundable credit for your province or territory?",
+          "necessary": false
+        },
+        {
+          "id": "refundable-provincial-credits-2",
+          "prompt": "Have you checked the specific credits eligibility, relevant tax year and required expense evidence?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "northern-residents-deductions",
       "name": "Northern Residents Deductions",
       "group": "health_benefits",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Permanent residence in a prescribed northern or intermediate zone for at least six consecutive months",
+        "claim residency and travel components only when their separate conditions met."
+      ],
+      "requiredInformation": [
+        "Prescribed-zone address",
+        "residence dates",
+        "household claimants",
+        "travel receipts",
+        "employer travel benefits",
+        "lowest return airfare"
+      ],
+      "limits": [
+        "Zone A/B, dwelling and travel restrictions apply; use T2222 and documented annual rates. Six months alone does not establish the travel amount."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Line 25500 - Northern residents deductions",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-25500-northern-residents-deductions.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "northern-residents-deductions-1",
+          "prompt": "Did you live permanently in a prescribed northern/intermediate zone for at least six consecutive months?",
+          "necessary": true
+        },
+        {
+          "id": "northern-residents-deductions-2",
+          "prompt": "Have you checked the separate residency/travel rules, dwelling sharing and trip evidence for the component you want to claim?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "charitable-donations",
       "name": "Charitable donations",
       "group": "health_benefits",
-      "classification": "requires_rule_verification",
+      "classification": "non_refundable_credit",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Gift to registered charity or other qualified donee with valid receipt",
+        "eligible gift amount reduced by advantage received."
+      ],
+      "requiredInformation": [
+        "Official receipts",
+        "donee status",
+        "donation date",
+        "advantage",
+        "carryforwards",
+        "gifts in kind",
+        "net/taxable income"
+      ],
+      "limits": [
+        "Income-based limits, special gifts and carryforwards require Schedule 9 review; annual credit rates and AMT implications not implemented."
+      ],
+      "provincialDifferences": "Provincial donation rates differ; Quebec separate.",
+      "sources": [
+        {
+          "title": "Donations and gifts - Personal income tax",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-34900-donations-gifts.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "charitable-donations-1",
+          "prompt": "Did you make an eligible gift to a registered charity or other qualified donee?",
+          "necessary": true
+        },
+        {
+          "id": "charitable-donations-2",
+          "prompt": "Do you have an official receipt and details of any advantage, carried-forward gifts or special property gifts?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "investment-loan-interest",
       "name": "Investment loan interest",
       "group": "investment_business",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Borrowed funds traceably used to earn investment income such as interest/dividends",
+        "interest paid",
+        "legal obligation and reasonableness conditions need review."
+      ],
+      "requiredInformation": [
+        "Loan agreement",
+        "interest statement",
+        "tracing of use",
+        "investment income purpose",
+        "registered-account status"
+      ],
+      "limits": [
+        "Registered-plan borrowing and capital-gains-only investments excluded; principal repayments not interest deductions; allocate mixed personal use."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Carrying charges and interest expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-22100-carrying-charges-interest-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "investment-loan-interest-1",
+          "prompt": "Was borrowed money used to earn investment income such as interest/dividends, rather than only capital gains or registered-account income?",
+          "necessary": true
+        },
+        {
+          "id": "investment-loan-interest-2",
+          "prompt": "Do you have interest-payment evidence and loan-use tracing including any personal portion?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "investment-management-fees",
       "name": "Investment management fees",
       "group": "investment_business",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Qualifying investment management or advice fees to earn investment income",
+        "exclude registered-account services and trading commissions."
+      ],
+      "requiredInformation": [
+        "Invoices",
+        "service type",
+        "account registration",
+        "business qualifications of adviser",
+        "reimbursement"
+      ],
+      "limits": [
+        "RRSP/RRIF/TFSA/FHSA and other listed registered accounts excluded; brokerage commissions affect capital gain/loss instead; no duplicate claim."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Carrying charges and interest expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-22100-carrying-charges-interest-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "investment-management-fees-1",
+          "prompt": "Did you pay qualifying investment-management/advice fees for a non-registered investment account?",
+          "necessary": true
+        },
+        {
+          "id": "investment-management-fees-2",
+          "prompt": "Have you excluded brokerage commissions, registered-account fees and amounts already deducted?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "capital-loss-carryforwards",
       "name": "Capital loss carryforwards",
       "group": "investment_business",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Unused assessed net capital losses of earlier years applied against taxable capital gains, subject to historical loss rules."
+      ],
+      "requiredInformation": [
+        "CRA assessed loss balances by year",
+        "current taxable gains",
+        "inclusion rates",
+        "prior applications"
+      ],
+      "limits": [
+        "Normally offsets taxable capital gains only; carry back three years or forward indefinitely. Historical inclusion-rate adjustments and pre-1985 exceptions require review."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Line 25300 \u2013 Net capital losses of other years",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-25300-net-capital-losses-other-years.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "capital-loss-carryforwards-1",
+          "prompt": "Do you have unused assessed net capital losses from earlier years and taxable capital gains to offset?",
+          "necessary": true
+        },
+        {
+          "id": "capital-loss-carryforwards-2",
+          "prompt": "Have you verified balances by year, historical inclusion-rate adjustments and previous loss applications?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "business-use-of-home-expenses",
       "name": "Business-use-of-home expenses",
       "group": "investment_business",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Workspace is principal business place OR used exclusively to earn business income and regularly/continuously to meet clients",
+        "only reasonable business portion."
+      ],
+      "requiredInformation": [
+        "Self-employment details",
+        "workspace area and time",
+        "expenses",
+        "business income",
+        "carryforward",
+        "reimbursements"
+      ],
+      "limits": [
+        "Cannot create or increase a business loss; unused qualifying expenses may carry forward; personal share excluded."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Business-use-of-home expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/report-business-income-expenses/completing-form-t2125/business-use-home-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": 2025
+      },
+      "screeningQuestions": [
+        {
+          "id": "business-use-of-home-expenses-1",
+          "prompt": "Is the workspace your principal business place OR used exclusively for business and regularly/continuously to meet clients?",
+          "necessary": true
+        },
+        {
+          "id": "business-use-of-home-expenses-2",
+          "prompt": "Have you documented reasonable business area/time, eligible costs and the restriction against creating/increasing a business loss?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "self-employment-vehicle-expenses",
       "name": "Self-employment vehicle expenses",
       "group": "investment_business",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Self-employed vehicle use to earn business income",
+        "reasonable business portion documented",
+        "personal use excluded."
+      ],
+      "requiredInformation": [
+        "Business and total kilometre log",
+        "receipts",
+        "vehicle type",
+        "purchase/lease date",
+        "interest",
+        "reimbursements"
+      ],
+      "limits": [
+        "Separate vehicles and capital allowance from operating costs; passenger-vehicle interest/lease/capital ceilings and 2026 acquisition-year rules unresolved."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Motor vehicle expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses/motor-vehicle-expenses.html"
+        },
+        {
+          "title": "Business expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "self-employment-vehicle-expenses-1",
+          "prompt": "Did you use a vehicle to earn self-employment business income?",
+          "necessary": true
+        },
+        {
+          "id": "self-employment-vehicle-expenses-2",
+          "prompt": "Do you have business/total kilometre records and receipts, and have you checked personal use and vehicle-specific ceilings?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     },
     {
       "id": "business-equipment-and-software",
       "name": "Business equipment and software",
       "group": "investment_business",
-      "classification": "requires_rule_verification",
+      "classification": "deduction",
       "calculationEnabled": false,
-      "eligibilityStatus": "needs_information"
+      "eligibilityStatus": "insufficient_information",
+      "eligibilityConditions": [
+        "Business purpose and ownership/use established",
+        "determine current operating expense versus depreciable capital property before claiming."
+      ],
+      "requiredInformation": [
+        "Asset or software description",
+        "purchase and available-for-use dates",
+        "business share",
+        "CCA class",
+        "assistance",
+        "prior UCC",
+        "subscriptions"
+      ],
+      "limits": [
+        "Equipment is not automatically fully deductible. Asset class, first-year measures, available-for-use and mixed-use rules need verification; no blanket 2026 expensing assumption."
+      ],
+      "provincialDifferences": "Federal income deduction generally feeds provincial taxable income; Quebec and multi-jurisdiction cases require separate review.",
+      "sources": [
+        {
+          "title": "Capital cost allowance classes",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/report-business-income-expenses/claiming-capital-cost-allowance/classes.html"
+        },
+        {
+          "title": "Business expenses",
+          "url": "https://www.canada.ca/en/revenue-agency/services/tax/businesses/topics/sole-proprietorships-partnerships/business-expenses.html"
+        }
+      ],
+      "review": {
+        "reviewedOn": "2026-10-11",
+        "scope": "general_conditions_only",
+        "taxYearStatus": "2026_amounts_unverified",
+        "sourceTaxYear": null
+      },
+      "screeningQuestions": [
+        {
+          "id": "business-equipment-and-software-1",
+          "prompt": "Did you acquire equipment/software or pay subscriptions to earn business income?",
+          "necessary": true
+        },
+        {
+          "id": "business-equipment-and-software-2",
+          "prompt": "Have you determined operating-expense versus capital-property treatment, CCA class, business share and available-for-use date?",
+          "necessary": false
+        }
+      ],
+      "screeningScope": "Self-reported preliminary screening; yes answers establish only potential eligibility. Annual limits, source-year applicability and all special circumstances remain unverified."
     }
-  ]
+  ],
+  "schemaVersion": 2,
+  "reviewedOn": "2026-10-11",
+  "verificationStatus": "general_conditions_reviewed_2026_amounts_unverified",
+  "calculationPolicy": "Screening catalog never changes tax totals. A source update date is not its tax year. Annual amounts require tax-year-specific verification and tested implementation."
 }
