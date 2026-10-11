@@ -139,7 +139,7 @@ export function calculate(raw){
  function personalCalculation(){
     const c=$('country').value,w=val('wages'),se=val('selfEmployment'),total=w+val('interest')+se+val('rentalIncome')+val('retirement')+val('otherIncome');
     let deductions=0,federal=0,region=0,payroll=0,note='',inc=[],marginal=0;
-    if(c==='us'){
+    function personalUS(){
       const status=$('filingStatus').value;
       if($('standardDeduction').checked)deductions=usStd[status];
       else deductions=val('mortgageInterest')+Math.min(val('propertyTax'),10000)+val('charitableDonations')+Math.max(val('medicalExpenses')-total*.075,0);
@@ -157,8 +157,9 @@ export function calculate(raw){
         selfEmploymentTax:roundMoney(setax),employeeFica:null
       };
       result.components.payrollContributions=roundMoney(setax);
-      return finalize(result)
-    }else{
+      return finalize(result);
+    }
+    function personalCA(){
       deductions=val('rrspContrib')+val('eligibleEmploymentDues');
       const taxable=Math.max(total-deductions,0),prov=$('subRegion').value;
       federal=caFederalTax(taxable,w);
@@ -172,8 +173,9 @@ export function calculate(raw){
       result.payrollComponents={
         cpp:roundMoney(p.cpp),ei:roundMoney(p.ei),selfEmploymentCpp:se>0?null:0
       };
-      return finalize(result)
+      return finalize(result);
     }
+    return c==='us'?personalUS():personalCA();
   }
  function businessCalculation(){
     const gross=val('grossReceipts'),returns=val('returnsAllowances');
