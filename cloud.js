@@ -10,7 +10,7 @@
  };
  const collect=()=>{
   const input={country:$('country').value,subRegion:$('subRegion').value,mode,filingStatus:$('filingStatus').value,businessType:$('businessType').value,standardDeduction:$('standardDeduction').checked,employmentDuesConfirmed:$('employmentDuesConfirmed')?.checked===true};
-  document.querySelectorAll('input[type=number]').forEach(el=>{input[el.id]=Number(el.value||0)});return input;
+  document.querySelectorAll('input[type=number]').forEach(el=>{input[el.id]=el.id==='withholding'&&el.value===''?null:Number(el.value||0)});return input;
  };
  const pending=async(button,work)=>{button.disabled=true;try{setError('');await work();}catch(e){setError(e.message);}finally{button.disabled=false;}};
  async function calculateOnServer(){const input=collect();const data=await request('/api/calculate',{method:'POST',body:input});lastInput=input;renderResult(data.result);return data.result;}
