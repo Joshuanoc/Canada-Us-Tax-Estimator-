@@ -3,7 +3,9 @@ import {calculate,normalizeInput} from './tax.js';
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 class HttpError extends Error{constructor(status,message){super(message);this.status=status;}}
 export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createRateLimiter({env})}={}){
+ const cloudEnabled=()=>env.TAXMETRIC_CLOUD_STORAGE_ENABLED==='true';
  const config=()=>{
+  if(!cloudEnabled())throw new HttpError(503,'Cloud saving is disabled. Scenarios can be saved in this browser.');
   if(!env.SUPABASE_URL||!env.SUPABASE_PUBLISHABLE_KEY)throw new HttpError(503,'Cloud saving is not configured.');
   const url=new URL(env.SUPABASE_URL);
   if(url.protocol!=='https:')throw new HttpError(503,'Storage requires HTTPS.');
@@ -54,13 +56,14 @@ export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createR
     let protectionConfigured=false;
     try{const endpoint=new URL(env.UPSTASH_REDIS_REST_URL);protectionConfigured=endpoint.protocol==='https:'&&!endpoint.username&&!endpoint.password&&Boolean(env.UPSTASH_REDIS_REST_TOKEN)&&typeof env.RATE_LIMIT_SECRET==='string'&&env.RATE_LIMIT_SECRET.length>=32;}catch{}
     const calculationApiAvailable=!production||protectionConfigured;
-    return send(200,{status:'ok',calculationApiAvailable,storageConfigured:calculationApiAvailable&&Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v1'});
+    return send(200,{status:'ok',calculationApiAvailable,storageConfigured:cloudEnabled()&&calculationApiAvailable&&Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v1'});
    }
    if(path==='/api/calculate'&&req.method==='POST'){
     await rateLimit(req,'calculate',60,60);
     const input=await body(req);let result;try{result=calculate(input);}catch(e){throw new HttpError(400,e.message);}return send(200,{result});
    }
    if(path==='/api/scenarios'){
+    config();
     await rateLimit(req,'scenarios',60,60);
     if(req.method==='POST')await rateLimit(req,'save-ip',20,3600);
     if(req.method==='POST'){

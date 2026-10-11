@@ -33,3 +33,7 @@ GitHub branch-protection API denied integration access; enforcement is **unverif
 ## Browser test blocker
 
 Desktop Chromium and Pixel 7 Chromium projects include failure screenshots, traces, HTML and JSON reports. Initial run could not launch any browser: executable absent. Installing bundled Chromium repeatedly returned empty/corrupt archives in the restricted execution network. These failures are environment blockers, not passing UI evidence. GitHub CI run 38177897876 installed Chromium and passed all 98 desktop/mobile cases on integrated commit ec3471b2d30f7fea4f263da26b9eecc1e5a6f659. This resolves the local environment blocker for automated browser evidence; manual visual review is still pending.
+
+## Release default: optional persistence disabled
+
+Cloud storage is disabled unless the server explicitly sets `TAXMETRIC_CLOUD_STORAGE_ENABLED=true`. Health reports storage unavailable and every scenario endpoint returns 503 before contacting identity/storage providers when disabled. Existing guest access and saves remain implemented for explicitly enabled deployments. Free standard browser calculations and browser-local saving do not require Supabase, Redis or paid services. Enable optional cloud saving only after verifying live grants/RLS, anonymous auth, retention/privacy settings and production rate limiting. This flag is a release safety default, not proof of live provider security. Source-level CI gates do not establish repository branch-rule enforcement.

@@ -28,7 +28,7 @@ test('Vercel requires its trusted IP header',async()=>{
  await limit({...req,headers:{'x-vercel-forwarded-for':'203.0.113.7','x-forwarded-for':'forged'}},'save',1,60);
 });
 test('API rejects abuse before storage and returns Retry-After',async t=>{
- let calls=0;const s=http.createServer(createHandler({env:{},fetchImpl:async()=>{calls++;throw Error('must not run')},rateLimit:async()=>{throw Object.assign(new Error('Too many requests.'),{status:429,retryAfter:30})}}));
+ let calls=0;const s=http.createServer(createHandler({env:{TAXMETRIC_CLOUD_STORAGE_ENABLED:'true',SUPABASE_URL:'https://test.supabase.co',SUPABASE_PUBLISHABLE_KEY:'test-public'},fetchImpl:async()=>{calls++;throw Error('must not run')},rateLimit:async()=>{throw Object.assign(new Error('Too many requests.'),{status:429,retryAfter:30})}}));
  await new Promise(r=>s.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>s.close(r)));
  const r=await fetch(`http://127.0.0.1:${s.address().port}/api/scenarios`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({input:{wages:1}})});
  assert.equal(r.status,429);assert.equal(r.headers.get('retry-after'),'30');assert.equal(calls,0);
