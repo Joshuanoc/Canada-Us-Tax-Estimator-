@@ -26,7 +26,7 @@ Withholding is optional. Its balance comparison covers modeled taxes only, and i
 
 Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in the hosting environment, enable anonymous sign-ins, and review/apply `database/001_scenarios.sql` to the intended project. No service-role key is needed. Source SQL and local policy tests do not establish that a live project's permissions match.
 
-Guest identity is kept in HttpOnly cookies. Scenarios are owner-scoped and protected by row policies. Clearing cookies loses access; no account recovery or device synchronization is provided. Without storage configuration, standard mode remains available and saves stay in browser-local storage.
+Production API request protection also requires the existing distributed limiter configuration in `.env.example`; secrets must be set only in host settings. Missing protection keeps the UI in browser mode. Guest identity is kept in HttpOnly cookies. Scenarios are owner-scoped and protected by row policies. Clearing cookies loses access; no account recovery or device synchronization is provided. Without storage configuration, standard mode remains available and saves stay in browser-local storage.
 
 Endpoints are `POST /api/calculate`, `GET/POST /api/scenarios`, `DELETE /api/scenarios?id=<uuid>`, and `GET /api/health`. Health reports configuration presence, not live storage readiness. Calculation and save inputs are validated; stored results are recalculated on the server.
 

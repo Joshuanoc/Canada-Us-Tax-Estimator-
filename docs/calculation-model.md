@@ -31,7 +31,7 @@ health premium, surtax and basic no-dependant reduction are implemented. Other i
 Payroll assumes full-year pensionable and insurable employment with one employer.
 RRSP is an entered deductible claim, with deduction-room eligibility not validated.
 US ordinary-income brackets and base standard deductions were verified against
-IRS Revenue Procedure2025-32 (https://www.irs.gov/pub/irs-drop/rp-25-32.pdf). Mixed wages/self-employment is refused because Social Security cap
+IRS Revenue Procedure 2025-32 (https://www.irs.gov/pub/irs-drop/rp-25-32.pdf). Mixed wages/self-employment is refused because Social Security cap
 coordination is missing. Other US deduction eligibility and state taxes are incomplete.
 
 Unknown state tax, refundable credits, benefit payments and complete refunds are
@@ -50,30 +50,30 @@ remain production-release blockers for any claim of complete tax calculation.
 
 ## Full-year Canadian employee payroll reference
 
-The official T4127 2026 tables8.3–8.7 verify CPP base4.95%, first enhancement1%,
-YMPE74,600, exemption3,500, CPP2 earnings74,600–85,000 at4%, and EI1.63%
-on up to68,900. The guide federal K2/F5 formulas separate the base credit from
-the enhanced deduction. For100,000 wages: baseCPP3,519.45, enhancement711,
+The official T4127 2026 tables 8.3–8.7 verify CPP base 4.95%, first enhancement 1%,
+YMPE 74,600, exemption 3,500, CPP2 earnings74,600–85,000 at 4%, and EI 1.63%
+on up to 68,900. The guide federal K2/F5 formulas separate the base credit from
+the enhanced deduction. For 100,000 wages: base CPP 3,519.45, enhancement711,
 CPP2 416, EI1,123.07; deductible enhancement1,127 and federal payroll credit
-649.9528. Federal bracket tax less BPA, employment and payroll credits is13,301.60.
+649.9528. Federal bracket tax less BPA, employment and payroll credits is 13,301.60.
 This is a documented component arithmetic case, not a complete CRA return comparison.
 
-Ontario2026 adjustments use the same CRA T4127 Ontario V1/V2/S formulas.
-The basic reduction excludes dependant supplements. At100,000 wages afterCPP
-deduction, taxable income98,873 gives provincial tax6,722.75 including
-provincial CPP/EI credit, surtax and750 health premium. Boundary tests cover each
+Ontario 2026 adjustments use the same CRA T4127 Ontario V1/V2/S formulas.
+The basic reduction excludes dependant supplements. At 100,000 wages after CPP
+deduction, taxable income 98,873 gives provincial tax 6,722.75 including
+provincial CPP/EI credit, surtax and 750 health premium. Boundary tests cover each
 premium band and both surtax thresholds.
 
 ## US 2026 SALT correction
 
-IRS primary correction guidance confirms the2026 cap40,400 (20,200 separate),
-MAGI threshold505,000 (252,500 separate) and floors10,000 (5,000 separate):
+IRS primary correction guidance confirms the 2026 cap 40,400 (20,200 separate),
+MAGI threshold 505,000 (252,500 separate) and floors 10,000 (5,000 separate):
 https://www.irs.gov/forms-pubs/correction-to-state-and-local-income-tax-deduction-amount-in-the-2026-form-1040-es.
-The ScheduleA worksheet (https://www.irs.gov/instructions/i1040sca) applies
-a30% excess-MAGI reduction before halving the resulting limit for separate
+The Schedule A worksheet (https://www.irs.gov/instructions/i1040sca) applies
+a 30% excess-MAGI reduction before halving the resulting limit for separate
 filers. The engine models MAGI as its ordinary-income AGI, with no foreign/territory
 exclusions. Only entered property tax is included; omitted state income/sales tax
-may increase the eligible total. Medical7.5% floor now also uses modeled AGI.
+may increase the eligible total. Medical 7.5% floor now also uses modeled AGI.
 IRA/HSA inputs represent eligible deductible claims, with eligibility and
 contribution limits not validated. Additional standard deductions for age/blindness,
 dependent standard-deduction rules, charitable restrictions and AMT remain omitted.
