@@ -32,6 +32,7 @@ test('Canadian Ontario wages calculates income tax separately from CPP/EI and RR
  expect(await amount(page,'estimatedTax')).toBe(Math.round(federal+provincial));
  expect(await amount(page,'payrollTax')).toBe(Math.round(payroll));
  expect(await amount(page,'afterTax')).toBe(Math.round(100000-federal-provincial-payroll));
+ await expect(page.locator('#marginalRate')).toHaveText('31.5%');
  await expect(page.locator('#planningPanel')).toBeVisible();await page.locator('#rrspWhatIf').fill('1000');expect(await amount(page,'rrspSavings')).toBe(315);
 });
 test('negative income and unsupported dividend income are rejected',async({page})=>{

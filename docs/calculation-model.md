@@ -77,3 +77,7 @@ may increase the eligible total. Medical 7.5% floor now also uses modeled AGI.
 IRA/HSA inputs represent eligible deductible claims, with eligibility and
 contribution limits not validated. Additional standard deductions for age/blindness,
 dependent standard-deduction rules, charitable restrictions and AMT remain omitted.
+
+## Marginal-rate consistency
+
+The displayed modeled marginal income-tax rate measures tax on the next cent of ordinary income, with employment/payroll facts held fixed. It includes modeled credit phase-outs, Ontario surtax/premiums and US itemized deduction changes, and excludes payroll and unmodeled rules. Ontario employment at 100,000 gives 31.48%, consistent with the RRSP comparison; an itemized US case at 510,000 with 50,000 property tax gives 45.50% during the SALT phase-down. Rates at thresholds describe the next-cent interval.

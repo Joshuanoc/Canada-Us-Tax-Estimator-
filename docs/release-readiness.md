@@ -26,6 +26,10 @@ On the integrated source corresponding to GitHub commit `ec3471b2d30f7fea4f263da
 
 GitHub Actions run https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/actions/runs/38177897876 is the initial integrated-source CI run. It passed the full-history secret scan, 129 unit tests, 98 desktop/mobile browser tests, dependency audit, tracked-file scan and build. Evidence artifact: https://github.com/Joshuanoc/Canada-Us-Tax-Estimator-/actions/runs/38177897876/artifacts/11716856499 (seven-day retention). Any later commit requires its own required checks.
 
+## Subsequent marginal-rate regression
+
+A final consistency fix makes marginal rates reflect modeled surtax, premiums and deduction phase-outs. The updated local suite passed **130 tests (23 backend and 107 screening), 0 failures**; build and tracked-file scan passed. The Ontario browser reference now also asserts the 31.5% displayed marginal rate. This code change requires a fresh desktop/mobile CI run; see the exact current commit checks in PR #9.
+
 ## Preserved free mode and release controls
 
 Browser calculation and local saving require no account, paid API, subscription, or cloud AI. The optional pre-existing protected API/storage path requires separately configured services. When production request-protection configuration is missing, the frontend keeps free browser calculation instead of selecting a failing API.

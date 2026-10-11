@@ -5,7 +5,7 @@
 Reviewed tracked application, API, storage SQL, dependency lockfile and release configuration. This is a source review with mocked provider tests and local PostgreSQL (PGlite), not a certification of deployed infrastructure or historical secret exposure.
 
 - `npm ci`: passed.
-- Merged backend suite: 22 tests passed after API/schema fixes, shared limiter restoration, configuration-health fallback and package dependency checks.
+- Merged backend suite: 23 tests passed including the final marginal-rate regression after API/schema fixes, shared limiter restoration, configuration-health fallback and package dependency checks.
 - `npx playwright test --list`: 98 desktop/mobile cases collected successfully; collection is not execution.
 - `npm audit --audit-level=high`: all dependencies included; zero reported vulnerabilities on review date.
 - Backend API tests: validate numeric inputs, recompute saved results, isolate guest owners, refresh sessions, reject cross-site mutations, reject malformed JSON/session cookies and oversized bodies.

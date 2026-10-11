@@ -11,12 +11,6 @@ const progressive=(income,brackets)=>{
     prev=cap
   }return Math.max(tax,0)
 };
-
-const rateAt=(income,brackets)=>{
-  for(const[cap,rate]of brackets)if(income<=cap)return rate;
-  return brackets.at(-1)[1]
-};
-
 import {
    saltDeduction2026, usBrackets, usStd, caFederal, caProv, provBPA, usRegions, caRegions 
 } from './tax-rules-2026.js';
@@ -154,7 +148,11 @@ export function calculate(raw){
       const taxable=Math.max(total-deductions,0);
       federal=progressive(taxable,usBrackets[status]);
       payroll=setax;
-      marginal=rateAt(taxable,usBrackets[status])*100;
+      const increment=.01;
+      const nextAdjustedIncome=Math.max(0,total+increment-val('retirementContrib')-val('hsaContrib')-setax/2);
+      const nextItemized=val('mortgageInterest')+saltDeduction2026(val('propertyTax'),nextAdjustedIncome,status)+val('charitableDonations')+Math.max(val('medicalExpenses')-nextAdjustedIncome*.075,0);
+      const nextDeductions=($('standardDeduction').checked?usStd[status]:nextItemized)+val('retirementContrib')+val('hsaContrib')+setax/2;
+      marginal=roundMoney((progressive(Math.max(total+increment-nextDeductions,0),usBrackets[status])-federal)/increment*100);
       note='Federal ordinary-income tax. Self-employment tax is reported separately as a payroll contribution. State tax and employee FICA withholding are excluded.';
       inc=[[true,'2026 federal brackets'],[true,'2026 standard/itemized deduction'],[true,'Self-employment tax when applicable'],[false,'State income tax'],[false,'Employee FICA withholding'],[false,'Capital gains / qualified dividends'],[false,'2026 special deduction eligibility (tips, overtime, seniors, auto interest)']];
       const result=makeResult(total,deductions,taxable,federal,region,payroll,marginal,note,inc,silent);
@@ -171,7 +169,11 @@ export function calculate(raw){
       federal=caFederalTax(taxable,w,p);
       region=caProvinceTax(taxable,prov,p);
       payroll=p.total;
-      marginal=(rateAt(taxable,caFederal)+(prov&&caProv[prov]?rateAt(taxable,caProv[prov]):0))*100;
+      // Next-cent modeled income-tax rate includes credit phase-outs, surtax
+      // and premiums. Employment/payroll facts stay fixed for this comparison.
+      const increment=.01;
+      const nextTaxable=Math.max(total+increment-deductions,0);
+      marginal=roundMoney((caFederalTax(nextTaxable,w,p)+caProvinceTax(nextTaxable,prov,p)-federal-region)/increment*100);
       note='Federal/provincial bracket tax includes the federal basic personal credit, Canada Employment Amount, and selected provincial BPA credits where available. CPP/EI are shown as cash-flow deductions, not income tax.';
       inc=[[true,'2026 federal brackets'],[true,'Federal basic personal credit'],[true,'Canada Employment Amount'],[true,'RRSP deduction'],[!!prov,'Province/territory selected'],[!!provBPA[prov],provBPA[prov]?`${prov} basic personal credit`:'Province-specific BPA not modeled'],[p.supported,'CPP/CPP2 + EI payroll contribution'],[false,'CPP coordination for mixed employment + self-employment'],[false,'Many other federal/provincial credits & surtaxes'],[false,'Capital gains / dividend gross-up rules']];
       const result=makeResult(total,deductions,taxable,federal,region,payroll,marginal,note,inc,silent);

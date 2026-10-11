@@ -4,6 +4,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculate, normalizeInput } from '../../backend/tax.js';
 
+test('modeled marginal income tax includes surtax and deduction phase-outs', () => {
+  assert.equal(calculate({country:'ca',subRegion:'ON',wages:100000}).marginal,31.48);
+  assert.equal(calculate({country:'ca',subRegion:'ON',wages:0}).marginal,0);
+  assert.equal(calculate({wages:100000}).marginal,22);
+  assert.equal(calculate({wages:510000,standardDeduction:false,propertyTax:50000}).marginal,45.5);
+});
+
 test('calculation is deterministic and explicitly versioned', () => {
   const input = { country: 'ca', subRegion: 'NS', wages: 65000 };
   assert.deepEqual(calculate(input), calculate(input));
