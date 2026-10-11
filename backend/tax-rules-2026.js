@@ -1,4 +1,11 @@
 // 2026 partial rule table. See docs/calculation-model.md for verification scope.
+export function saltDeduction2026(paid, modifiedAgi, status) {
+  const separate = status === 'married_separate';
+  // Schedule A worksheet halves the applicable limit after its MAGI reduction.
+  const threshold = separate ? 252500 : 505000;
+  const fullLimit = Math.max(10000, 40400 - .30 * Math.max(modifiedAgi - threshold, 0));
+  return Math.min(paid, separate ? fullLimit / 2 : fullLimit);
+}
 export const usBrackets={
   single:[[12400,.10],[50400,.12],[105700,.22],[201775,.24],[256225,.32],[640600,.35],[Infinity,.37]],married_joint:[[24800,.10],[100800,.12],[211400,.22],[403550,.24],[512450,.32],[768700,.35],[Infinity,.37]],married_separate:[[12400,.10],[50400,.12],[105700,.22],[201775,.24],[256225,.32],[384350,.35],[Infinity,.37]],head:[[17700,.10],[67450,.12],[105700,.22],[201750,.24],[256200,.32],[640600,.35],[Infinity,.37]]
 };

@@ -25,13 +25,14 @@ test('Canadian Ontario wages calculates income tax separately from CPP/EI and RR
  await page.locator('#country').selectOption('ca');await page.locator('#subRegion').selectOption('ON');
  await page.locator('#wages').fill('100000');await submit(page);
  // Independently calculated expectations for the repository's stated 2026 model, not a full tax-law certification.
- const federal=58523*.14+(100000-58523)*.205-16452*.14-1501*.14;
- const provincial=53891*.0505+(100000-53891)*.0915-12989*.0505;
+ const federal=58523*.14+(98873-58523)*.205-16452*.14-1501*.14-(3519.45+1123.07)*.14;
+ const basic=53891*.0505+(98873-53891)*.0915-12989*.0505-(3519.45+1123.07)*.0505;
+ const provincial=basic+Math.max(basic-5818,0)*.20+750;
  const payroll=71100*.0595+10400*.04+68900*.0163;
  expect(await amount(page,'estimatedTax')).toBe(Math.round(federal+provincial));
  expect(await amount(page,'payrollTax')).toBe(Math.round(payroll));
  expect(await amount(page,'afterTax')).toBe(Math.round(100000-federal-provincial-payroll));
- await expect(page.locator('#planningPanel')).toBeVisible();await page.locator('#rrspWhatIf').fill('1000');expect(await amount(page,'rrspSavings')).toBe(297);
+ await expect(page.locator('#planningPanel')).toBeVisible();await page.locator('#rrspWhatIf').fill('1000');expect(await amount(page,'rrspSavings')).toBe(315);
 });
 test('negative income and unsupported dividend income are rejected',async({page})=>{
  await page.locator('#wages').fill('-1');await submit(page);await expect(page.locator('#errorBox')).toContainText('cannot be negative');

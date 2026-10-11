@@ -1,4 +1,5 @@
 import { ontarioAdjustments, ontarioHealthPremium } from '../../backend/ontario-2026.js';
+import { saltDeduction2026 } from '../../backend/tax-rules-2026.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculate, normalizeInput } from '../../backend/tax.js';
@@ -8,6 +9,19 @@ test('calculation is deterministic and explicitly versioned', () => {
   assert.deepEqual(calculate(input), calculate(input));
   assert.equal(calculate(input).taxYear, 2026);
   assert.throws(() => calculate({ taxYear: 2025 }), /tax year/);
+});
+test('IRS 2026 standard deductions, ordinary brackets and SALT limits',()=>{
+  for(const [filingStatus,deduction] of [['single',16100],['married_separate',16100],['married_joint',32200],['head',24150]]){
+    assert.equal(calculate({filingStatus,wages:100000}).deductions,deduction);
+  }
+  assert.equal(calculate({wages:100000}).federal,13170);
+  assert.equal(saltDeduction2026(50000,505000,'single'),40400);
+  assert.equal(saltDeduction2026(50000,515000,'single'),37400);
+  assert.equal(saltDeduction2026(50000,1000000,'single'),10000);
+  assert.equal(saltDeduction2026(50000,252500,'married_separate'),20200);
+  assert.equal(saltDeduction2026(50000,262500,'married_separate'),18700);
+  assert.equal(saltDeduction2026(50000,1000000,'married_separate'),5000);
+  assert.equal(calculate({wages:100000,standardDeduction:false,propertyTax:30000}).deductions,30000);
 });
 test('US self-employment tax is separated from federal ordinary income tax', () => {
   assert.throws(() => calculate({ wages: 50000, selfEmployment: 50000 }), /coordination/);

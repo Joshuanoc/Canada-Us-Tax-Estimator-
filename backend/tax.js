@@ -18,7 +18,7 @@ const rateAt=(income,brackets)=>{
 };
 
 import {
-   usBrackets, usStd, caFederal, caProv, provBPA, usRegions, caRegions 
+   saltDeduction2026, usBrackets, usStd, caFederal, caProv, provBPA, usRegions, caRegions 
 } from './tax-rules-2026.js';
 
 
@@ -130,7 +130,7 @@ export function calculate(raw){
   const estimated=Math.max(federal+region,0),after=total-estimated-payroll;
     
   return {
-      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP amount is a user-confirmed deductible claim within available CRA deduction room']:['Ordinary income only; deduction eligibility is user-confirmed','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Ontario dependant tax-reduction supplements are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
+      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP amount is a user-confirmed deductible claim within available CRA deduction room']:['Ordinary income only; eligible deductible IRA/HSA claims are user-confirmed, contribution limits are not validated','SALT MAGI equals modeled AGI; no foreign-income exclusions or territory exclusions','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Ontario dependant tax-reduction supplements are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
         federalIncomeTax:roundMoney(federal),provincialIncomeTax:input.country==='ca'&&input.subRegion?roundMoney(region):null,stateIncomeTax:null,payrollContributions:input.country==='ca'?roundMoney(payroll):null
       }
     };
@@ -145,10 +145,11 @@ export function calculate(raw){
     let deductions=0,federal=0,region=0,payroll=0,note='',inc=[],marginal=0;
     function personalUS(){
       const status=$('filingStatus').value;
-      if($('standardDeduction').checked)deductions=usStd[status];
-      else deductions=val('mortgageInterest')+Math.min(val('propertyTax'),10000)+val('charitableDonations')+Math.max(val('medicalExpenses')-total*.075,0);
-      deductions+=val('retirementContrib')+val('hsaContrib');
       const setax=usSeTax(se);
+      const adjustedIncome=Math.max(0,total-val('retirementContrib')-val('hsaContrib')-setax/2);
+      if($('standardDeduction').checked)deductions=usStd[status];
+      else deductions=val('mortgageInterest')+saltDeduction2026(val('propertyTax'),adjustedIncome,status)+val('charitableDonations')+Math.max(val('medicalExpenses')-adjustedIncome*.075,0);
+      deductions+=val('retirementContrib')+val('hsaContrib');
       deductions+=setax/2;
       const taxable=Math.max(total-deductions,0);
       federal=progressive(taxable,usBrackets[status]);

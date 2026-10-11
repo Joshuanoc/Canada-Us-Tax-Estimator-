@@ -30,8 +30,8 @@ for the stated full-year employee assumptions. Provincial CPP/EI credits plus On
 health premium, surtax and basic no-dependant reduction are implemented. Other income-dependent provincial credits, and self-employed CPP remain missing.
 Payroll assumes full-year pensionable and insurable employment with one employer.
 RRSP is an entered deductible claim, with deduction-room eligibility not validated.
-US tables and deductions are preserved baseline estimates, not newly certified by
-this change. Mixed wages/self-employment is refused because Social Security cap
+US ordinary-income brackets and base standard deductions were verified against
+IRS Revenue Procedure2025-32 (https://www.irs.gov/pub/irs-drop/rp-25-32.pdf). Mixed wages/self-employment is refused because Social Security cap
 coordination is missing. Other US deduction eligibility and state taxes are incomplete.
 
 Unknown state tax, refundable credits, benefit payments and complete refunds are
@@ -63,3 +63,17 @@ The basic reduction excludes dependant supplements. At100,000 wages afterCPP
 deduction, taxable income98,873 gives provincial tax6,722.75 including
 provincial CPP/EI credit, surtax and750 health premium. Boundary tests cover each
 premium band and both surtax thresholds.
+
+## US 2026 SALT correction
+
+IRS primary correction guidance confirms the2026 cap40,400 (20,200 separate),
+MAGI threshold505,000 (252,500 separate) and floors10,000 (5,000 separate):
+https://www.irs.gov/forms-pubs/correction-to-state-and-local-income-tax-deduction-amount-in-the-2026-form-1040-es.
+The ScheduleA worksheet (https://www.irs.gov/instructions/i1040sca) applies
+a30% excess-MAGI reduction before halving the resulting limit for separate
+filers. The engine models MAGI as its ordinary-income AGI, with no foreign/territory
+exclusions. Only entered property tax is included; omitted state income/sales tax
+may increase the eligible total. Medical7.5% floor now also uses modeled AGI.
+IRA/HSA inputs represent eligible deductible claims, with eligibility and
+contribution limits not validated. Additional standard deductions for age/blindness,
+dependent standard-deduction rules, charitable restrictions and AMT remain omitted.
