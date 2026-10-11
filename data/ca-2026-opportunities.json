@@ -1,0 +1,287 @@
+{
+  "taxYear": 2026,
+  "country": "CA",
+  "status": "screening_only",
+  "entries": [
+    {
+      "id": "canada-employment-amount",
+      "name": "Canada Employment Amount",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "union-and-professional-dues",
+      "name": "Union and professional dues",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "professional-licensing-fees",
+      "name": "Professional licensing fees",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "canada-training-credit",
+      "name": "Canada Training Credit",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "student-loan-interest",
+      "name": "Student loan interest",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "tuition-credits",
+      "name": "Tuition credits",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "employment-expenses",
+      "name": "Employment expenses",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "moving-expenses",
+      "name": "Moving expenses",
+      "group": "employment",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "spouse-or-common-law-partner-amount",
+      "name": "Spouse or common-law partner amount",
+      "group": "family",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "childcare-expenses",
+      "name": "Childcare expenses",
+      "group": "family",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "eligible-dependant-amount",
+      "name": "Eligible dependant amount",
+      "group": "family",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "caregiver-credits",
+      "name": "Caregiver credits",
+      "group": "family",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "canada-child-benefit",
+      "name": "Canada Child Benefit",
+      "group": "family",
+      "classification": "separate_benefit_or_program",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "provincial-child-benefits",
+      "name": "Provincial child benefits",
+      "group": "family",
+      "classification": "separate_benefit_or_program",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "rrsp-contributions",
+      "name": "RRSP contributions",
+      "group": "home_retirement",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "fhsa-contributions",
+      "name": "FHSA contributions",
+      "group": "home_retirement",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "home-buyers-amount",
+      "name": "Home Buyers' Amount",
+      "group": "home_retirement",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "home-buyers-plan",
+      "name": "Home Buyers' Plan",
+      "group": "home_retirement",
+      "classification": "separate_benefit_or_program",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "home-accessibility-expenses",
+      "name": "Home accessibility expenses",
+      "group": "home_retirement",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "multigenerational-home-renovation-tax-credit",
+      "name": "Multigenerational Home Renovation Tax Credit",
+      "group": "home_retirement",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "pension-income-amount",
+      "name": "Pension income amount",
+      "group": "home_retirement",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "pension-income-splitting",
+      "name": "Pension income splitting",
+      "group": "home_retirement",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "disability-tax-credit",
+      "name": "Disability Tax Credit",
+      "group": "health_benefits",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "medical-expenses",
+      "name": "Medical expenses",
+      "group": "health_benefits",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "gst-hst-credit",
+      "name": "GST/HST credit",
+      "group": "health_benefits",
+      "classification": "separate_benefit_or_program",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "canada-workers-benefit",
+      "name": "Canada Workers Benefit",
+      "group": "health_benefits",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "refundable-provincial-credits",
+      "name": "Refundable provincial credits",
+      "group": "health_benefits",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "northern-residents-deductions",
+      "name": "Northern Residents Deductions",
+      "group": "health_benefits",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "charitable-donations",
+      "name": "Charitable donations",
+      "group": "health_benefits",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "investment-loan-interest",
+      "name": "Investment loan interest",
+      "group": "investment_business",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "investment-management-fees",
+      "name": "Investment management fees",
+      "group": "investment_business",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "capital-loss-carryforwards",
+      "name": "Capital loss carryforwards",
+      "group": "investment_business",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "business-use-of-home-expenses",
+      "name": "Business-use-of-home expenses",
+      "group": "investment_business",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "self-employment-vehicle-expenses",
+      "name": "Self-employment vehicle expenses",
+      "group": "investment_business",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    },
+    {
+      "id": "business-equipment-and-software",
+      "name": "Business equipment and software",
+      "group": "investment_business",
+      "classification": "requires_rule_verification",
+      "calculationEnabled": false,
+      "eligibilityStatus": "needs_information"
+    }
+  ]
+}
