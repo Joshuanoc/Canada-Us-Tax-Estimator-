@@ -13,7 +13,7 @@
   document.querySelectorAll('input[type=number]').forEach(el=>{input[el.id]=el.id==='withholding'&&el.value===''?null:Number(el.value||0)});return input;
  };
  const pending=async(button,work)=>{button.disabled=true;try{setError('');await work();}catch(e){setError(e.message);}finally{button.disabled=false;}};
- async function calculateOnServer(){const input=collect();const data=await request('/api/calculate',{method:'POST',body:input});lastInput=input;renderResult(data.result);return data.result;}
+ async function calculateOnServer(){const input=collect();try{const data=await request('/api/calculate',{method:'POST',body:input});lastInput=input;renderResult(data.result);return data.result;}catch(error){$('resultsPanel').classList.add('hidden');$('planningPanel').classList.add('hidden');throw error;}}
  async function listScenarios(){
   const {scenarios}=await request('/api/scenarios');const box=$('savedCalculations');box.replaceChildren();
   if(!scenarios.length){const p=document.createElement('p');p.className='panel-desc';p.textContent='No cloud scenarios saved yet.';box.append(p);return;}
