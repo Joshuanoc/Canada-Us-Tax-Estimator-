@@ -12,6 +12,10 @@ Reviewed 2026-10-11. Target tax year: 2026. All 35 catalog entries have a catego
 - No entry is calculation-enabled merely because it has a source. 2026 indexed limits, rates, enacted changes, province-specific schedules and interactions remain release gates.
 - The guided workflow may show potentially eligible from self-reported applicability, ineligible from an explicit user exclusion, and insufficient information for unknown answers. It must not certify legal eligibility from broad life-situation answers.
 
+## Questionnaire decision scope
+
+The catalog contains 70 item-specific questions. A negative answer excludes an opportunity only where `necessary: true` identifies a general prerequisite. Supporting-document gaps, program selection and historical capital-loss exceptions use non-decisive questions. Alternative conditions remain in a single OR question. All affirmative responses yield only potential eligibility; annual amounts and complex interactions still require review.
+
 ## Entry-by-entry review
 
 ### Canada Employment Amount

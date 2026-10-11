@@ -1576,8 +1576,8 @@
       "screeningQuestions": [
         {
           "id": "capital-loss-carryforwards-1",
-          "prompt": "Do you have unused assessed net capital losses from earlier years and taxable capital gains to offset?",
-          "necessary": true
+          "prompt": "Do you have unused assessed net capital losses from earlier years and taxable capital gains to offset (or a pre-May-23-1985 loss requiring special review)?",
+          "necessary": false
         },
         {
           "id": "capital-loss-carryforwards-2",
