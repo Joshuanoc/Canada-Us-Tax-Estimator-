@@ -1,0 +1,47 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { calculate, normalizeInput } from '../../backend/tax.js';
+
+test('calculation is deterministic and explicitly versioned', () => {
+  const input = { country: 'ca', subRegion: 'NS', wages: 65000 };
+  assert.deepEqual(calculate(input), calculate(input));
+  assert.equal(calculate(input).taxYear, 2026);
+  assert.throws(() => calculate({ taxYear: 2025 }), /tax year/);
+});
+test('US self-employment tax is separated from federal ordinary income tax', () => {
+  const r = calculate({ selfEmployment: 100000 });
+  const se = 100000 * .9235 * (.124 + .029);
+  assert.equal(r.payroll, Math.round(se * 100) / 100);
+  assert.equal(r.payrollComponents.selfEmploymentTax, r.payroll);
+  assert.equal(r.estimated, r.federal);
+  assert.equal(r.after, Math.round((100000 - r.federal - r.payroll) * 100) / 100);
+});
+test('unknown taxes and benefits remain unknown; refund requires more than withholding', () => {
+  const r = calculate({ wages: 100000 });
+  assert.equal(r.components.stateIncomeTax, null);
+  assert.equal(r.refundableCredits, null);
+  assert.equal(r.benefitPayments, null);
+  assert.equal(r.modeledSettlement, null);
+  const paid = calculate({ wages: 100000, withholding: 15000 });
+  assert.equal(paid.estimatedRefund, null);
+  assert.equal(paid.modeledSettlement.refund, 1830);
+  assert.equal(calculate({ wages: 100000, withholding: 10000 }).modeledSettlement.balanceDue, 3170);
+});
+test('input boundaries reject nonfinite, negative and unsupported amounts', () => {
+  for (const withholding of [-1, NaN, Infinity, '100', 1e9 + 1]) {
+    assert.throws(() => normalizeInput({ withholding }), /Withholding/);
+  }
+  assert.equal(normalizeInput({ withholding: 0 }).withholding, 0);
+  assert.equal(calculate({ wages: 0 }).estimated, 0);
+  assert.equal(calculate({ wages: 28500 }).federal, 1240);
+  assert.equal(calculate({ wages: 28500.01 }).federal, 1240);
+});
+test('eligible employment dues require explicit confirmation and reduce income once', () => {
+  const baseline = { country: 'ca', subRegion: 'NS', wages: 65000 };
+  assert.throws(() => calculate({ ...baseline, eligibleEmploymentDues: 1000 }), /confirmation/);
+  assert.throws(() => calculate({ eligibleEmploymentDues: 1000, employmentDuesConfirmed: true }), /Canadian/);
+  const r = calculate({ ...baseline, eligibleEmploymentDues: 1000, employmentDuesConfirmed: true });
+  assert.equal(r.deductions, 1000);
+  assert.equal(r.taxable, 64000);
+  assert.ok(r.estimated < calculate(baseline).estimated);
+});
