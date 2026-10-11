@@ -114,3 +114,9 @@ test('RRSP claims and planner require confirmed CRA room',async({page})=>{
  await page.locator('#rrspWhatIf').fill('1000');await expect(page.locator('#rrspSavings')).not.toHaveText('Not calculated');
  await expect(page.locator('#modelAssumptions')).toContainText('Full-year resident');await expect(page.locator('#modelLimitations')).toContainText('incomplete');
 });
+
+test('unsupported donation controls and high self-employment scope are explicit',async({page})=>{
+ await page.locator('#standardDeduction').uncheck();await expect(page.locator('#charitableDonations')).toBeDisabled();await expect(page.locator('#donationHelp')).toContainText('not yet modeled');
+ await page.locator('#selfEmployment').fill('300000');await submit(page);await expect(page.locator('#errorBox')).toContainText('Additional Medicare');await expect(page.locator('#resultsPanel')).toBeHidden();
+ await page.locator('#country').selectOption('ca');await expect(page.locator('#selfEmploymentHelp')).toContainText('unavailable');await submit(page);await expect(page.locator('#errorBox')).toContainText('self-employment');
+});
