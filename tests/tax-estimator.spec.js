@@ -120,3 +120,17 @@ test('unsupported donation controls and high self-employment scope are explicit'
  await page.locator('#selfEmployment').fill('300000');await submit(page);await expect(page.locator('#errorBox')).toContainText('Additional Medicare');await expect(page.locator('#resultsPanel')).toBeHidden();
  await page.locator('#country').selectOption('ca');await expect(page.locator('#selfEmploymentHelp')).toContainText('unavailable');await submit(page);await expect(page.locator('#errorBox')).toContainText('self-employment');
 });
+test('hidden Canadian claims do not leak into US or business calculations',async({page})=>{
+ await page.locator('#country').selectOption('ca');
+ await page.locator('#eligibleEmploymentDues').fill('500');
+ await page.locator('#employmentDuesConfirmed').check();
+ await page.locator('#rrspContrib').fill('1000');
+ await page.locator('#country').selectOption('us');
+ await page.locator('#wages').fill('100000');await submit(page);
+ await expect(page.locator('#resultsPanel')).toBeVisible();
+ await expect(page.locator('#payrollTax')).toHaveText('Not modeled');
+ await page.locator('#businessBtn').click();
+ await page.locator('#businessType').selectOption('c_corp');
+ await page.locator('#grossReceipts').fill('60000');await submit(page);
+ await expect(page.locator('#marginalRate')).toHaveText('21.0%');
+});

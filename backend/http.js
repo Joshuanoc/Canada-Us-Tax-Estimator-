@@ -56,7 +56,7 @@ export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createR
     let protectionConfigured=false;
     try{const endpoint=new URL(env.UPSTASH_REDIS_REST_URL);protectionConfigured=endpoint.protocol==='https:'&&!endpoint.username&&!endpoint.password&&Boolean(env.UPSTASH_REDIS_REST_TOKEN)&&typeof env.RATE_LIMIT_SECRET==='string'&&env.RATE_LIMIT_SECRET.length>=32;}catch{}
     const calculationApiAvailable=!production||protectionConfigured;
-    return send(200,{status:'ok',calculationApiAvailable,storageConfigured:cloudEnabled()&&calculationApiAvailable&&Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v1'});
+    return send(200,{status:'ok',calculationApiAvailable,storageConfigured:cloudEnabled()&&calculationApiAvailable&&Boolean(env.SUPABASE_URL&&env.SUPABASE_PUBLISHABLE_KEY),modelVersion:'2026-v2-partial'});
    }
    if(path==='/api/calculate'&&req.method==='POST'){
     await rateLimit(req,'calculate',60,60);
@@ -83,7 +83,7 @@ export function createHandler({fetchImpl=fetch,env=process.env,rateLimit=createR
      const data=await provider(`/rest/v1/scenarios?id=eq.${id}&owner_id=eq.${session.user.id}`,{method:'DELETE',token:session.token});if(!data?.length)throw new HttpError(404,'Scenario not found.');return send(200,{deleted:true});
     }
    }
-   return send(405,{error:'Method or endpoint not supported.'});
+   return send(['/api/health','/api/calculate','/api/scenarios'].includes(path)?405:404,{error:'Method or endpoint not supported.'});
   }catch(e){if(e.retryAfter)res.setHeader('Retry-After',String(e.retryAfter));return send(e.status||502,{error:e.status?e.message:'Backend service unavailable.'});}
  };
 }

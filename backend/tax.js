@@ -142,7 +142,7 @@ export function calculate(raw){
   const estimated=Math.max(federal+region,0),after=total-estimated-payroll;
     
   return {
-      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP claim is confirmed against receipts or undeducted contributions and an entered CRA deduction limit']:['Ordinary income only; positive IRA/HSA deductions are not supported','SALT MAGI equals modeled AGI; no foreign-income exclusions or territory exclusions','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Ontario dependant tax-reduction supplements are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
+      country:input.country,subRegion:input.subRegion,mode,total,deductions,taxable,federal,regionTax:region,payroll,estimated,effective:total>0?estimated/total*100:0,marginal,after,monthly:after/12,note,inc,score:completeness(inc),taxYear:input.taxYear,modelVersion:'2026-v2-partial',rounding:'Nearest cent at result boundaries; brackets computed before rounding',assumptions:input.country==='ca'?['Full-year resident; ordinary income only','Payroll assumes one employer, full-year CPP eligibility and insurable employment','RRSP claim is confirmed against receipts or undeducted contributions and an entered CRA deduction limit']:['Ordinary income only; positive IRA/HSA deductions are not supported','SALT MAGI equals modeled AGI; no foreign-income exclusions or territory exclusions','Self-employment estimate does not coordinate Social Security cap with employment wages'],limitations:input.country==='ca'?['Ontario dependant tax-reduction supplements are not modeled','Provincial reductions and income-dependent personal credits are incomplete','Canadian self-employment CPP is not modeled']:['State income tax and employee FICA are not modeled','Qualified business income (QBI) deduction is not modeled','Marginal income-tax rate excludes changes in self-employment payroll tax','Itemized deduction limits and special 2026 deductions are incomplete'],scope:'Partial ordinary-income estimate; eligibility, provincial adjustments and credits are incomplete',withholding:input.withholding,refundableCredits:null,benefitPayments:null,estimatedRefund:null,estimatedBalanceDue:null,modeledSettlement:settlement(input.withholding,estimated),components:{
         federalIncomeTax:roundMoney(federal),provincialIncomeTax:input.country==='ca'&&input.subRegion?roundMoney(region):null,stateIncomeTax:null,payrollContributions:input.country==='ca'?roundMoney(payroll):null
       }
     };
@@ -177,7 +177,7 @@ export function calculate(raw){
       result.payrollComponents={
         selfEmploymentTax:roundMoney(setax),employeeFica:null
       };
-      result.components.payrollContributions=roundMoney(setax);
+      result.components.payrollContributions=w>0?null:roundMoney(setax);
       return finalize(result);
     }
     function personalCA(){
@@ -226,7 +226,8 @@ export function calculate(raw){
       note='Pass-through entity: net business income shown; owner-level tax not included here.';
       inc=[[true,'Revenue, COGS and entered expenses'],[false,'Owner-level personal tax'],[false,'Entity-specific special rules']]
     }
-    const result=makeResult(revenue,cogs+expenses,Math.max(net,0),federal,0,0,0,note,inc,silent);
+    const corporateRate=c==='us'&&t==='c_corp'?21:c==='ca'&&t==='corp_general'?15:0;
+    const result=makeResult(revenue,cogs+expenses,Math.max(net,0),federal,0,0,net>=0?corporateRate:0,note,inc,silent);
     const corporate=(c==='us'&&t==='c_corp')||(c==='ca'&&t==='corp_general');
     result.netBusinessIncome=roundMoney(net);
     result.after=net-result.estimated;
