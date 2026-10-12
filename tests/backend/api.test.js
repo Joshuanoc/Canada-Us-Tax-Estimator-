@@ -66,3 +66,10 @@ test('cloud persistence is opt-in and never contacts storage when disabled',asyn
  for(const method of ['GET','POST','DELETE']){const r=await fetch(url+'/api/scenarios',{method,...(method==='POST'?{headers:{'Content-Type':'application/json'},body:'{}'}:{})});assert.equal(r.status,503);}
  assert.equal(calls,0);
 });
+test('health version matches calculation version and unknown routes return 404',async t=>{
+ const url=await server(t,{env:{}});
+ const health=await (await fetch(url+'/api/health')).json();
+ assert.equal(health.modelVersion,calculate({wages:1}).modelVersion);
+ assert.equal((await fetch(url+'/api/unknown')).status,404);
+ assert.equal((await fetch(url+'/api/calculate')).status,405);
+});
